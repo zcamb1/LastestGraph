@@ -1,11 +1,18 @@
 package com.samsung.iug.ui.rulemaker
 
+import com.example.testplugin.DeviceManager
+import com.intellij.openapi.fileChooser.FileChooserFactory
+import com.intellij.openapi.fileChooser.FileSaverDescriptor
+import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBTextField
 import java.awt.*
+import java.io.File
 import javax.swing.*
 import javax.swing.border.TitledBorder
 
-class ScreenInfoPanel : JPanel(BorderLayout()) {
+class ScreenInfoPanel : JPanel(GridBagLayout()) {
     private val screenIdField = JBTextField().apply {
         isEditable = true
     }

@@ -1,4 +1,4 @@
-package com.example
+package com.samsung.iug.ui
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow

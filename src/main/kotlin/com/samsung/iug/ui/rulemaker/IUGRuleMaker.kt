@@ -2,8 +2,10 @@ package com.samsung.iug.ui.rulemaker
 
 import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
+import com.samsung.iug.ui.screenmirror.MirrorPanel
 import java.awt.*
 import javax.swing.*
+import com.samsung.iug.service.Log
 
 class IUGRuleMaker : JPanel(BorderLayout()) {
 
@@ -64,6 +66,7 @@ class IUGRuleMaker : JPanel(BorderLayout()) {
         // Add graph panel (wide) and log panel (narrow) side by side
         bottomPanelsLayout.add(graphPanelContainer)
         bottomPanelsLayout.add(logPanelContainer)
+        Log.i("","ggg")
 
         // Add the bottom panels layout to the bottom section
         bottomSection.add(bottomPanelsLayout, BorderLayout.CENTER)

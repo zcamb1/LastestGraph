@@ -1,5 +1,8 @@
-package com.example.demologplugin
+package com.samsung.iug.service
 
+import com.samsung.iug.model.LogEntry
+import com.samsung.iug.model.LogLevel
+import com.samsung.iug.ui.LogPanel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

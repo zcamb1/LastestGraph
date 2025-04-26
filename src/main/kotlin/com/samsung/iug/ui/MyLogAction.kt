@@ -1,8 +1,9 @@
-package com.example.demologplugin
+package com.samsung.iug.ui
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.thisLogger
+import com.samsung.iug.service.Log
 
 //temp added
 class MyLogAction : AnAction() {

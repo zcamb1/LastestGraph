@@ -1,5 +1,6 @@
-package com.example.demologplugin
+package com.samsung.iug.ui
 
+import com.samsung.iug.model.LogEntry
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBList
 import java.awt.BorderLayout
