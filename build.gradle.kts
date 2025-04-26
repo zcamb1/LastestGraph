@@ -15,7 +15,7 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    localPath.set("D:/Install/Android/Android Studio 2023")
+    localPath.set("D:/Program/Android Studio 2023")
     plugins.set(listOf("android"))
 }
 
@@ -25,6 +25,8 @@ dependencies {
     implementation("org.bytedeco:javacv:1.5.8")
     implementation("org.bytedeco:javacv-platform:1.5.8")
     implementation("org.bytedeco:ffmpeg:5.1.2-1.5.8")
+    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("org.tinyjee.jgraphx:jgraphx:3.4.1.3")
 }
 
 tasks.processResources {
@@ -58,7 +60,7 @@ tasks {
 
     runIde {
 
-        ideDir.set(file("D:/Install/Android/Android Studio 2023"))
+        ideDir.set(file("D:/Program/Android Studio 2023"))
     }
 
     instrumentCode {

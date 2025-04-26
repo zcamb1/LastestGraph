@@ -2,127 +2,95 @@ package com.samsung.iug.ui.rulemaker
 
 import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
+import com.samsung.iug.model.Rule
+import com.samsung.iug.model.Step
 import com.samsung.iug.ui.screenmirror.MirrorPanel
+import com.samsung.iug.utils.JsonHelper
 import java.awt.*
 import javax.swing.*
-import com.samsung.iug.service.Log
 
-class IUGRuleMaker : JPanel(BorderLayout()) {
+class IUGRuleMaker(private val path: String, private val username: String) : JPanel(BorderLayout()) {
+
+    private lateinit var rule: Rule
+    private var commonInfoContent = CommonInfoPanel()
+    private var stepInfoContent = StepInfoPanel()
+    private lateinit var currentStep: Step
 
     init {
-        background = Color(60, 63, 65)
-        // Set background color for the main panel
-        background = Color(60, 63, 65)
+        // Top bar
+        val topLayout = createTopToolBar()
 
-        // Create toolbar with title and actions at the top
-        val topToolbarPanel = createTopToolbar()
-        add(topToolbarPanel, BorderLayout.NORTH)
-
-        // Main content panel
-        val mainContentPanel = JPanel(BorderLayout())
-        mainContentPanel.background = Color(60, 63, 65)
-
-        // Top section with Common Info/Step Info (tab) và Mirror Screen bằng nhau, Screen Info bên phải
-        val topSection = JPanel(BorderLayout())
-        topSection.background = Color(60, 63, 65)
-
+        // Common Info, Step Info, Mirror, Screen Info
         val combinedTabPanel = createCombinedTabPanel()
         val mirrorPanel = MirrorPanel()
         val screenInfoPanel = ScreenInfoPanel()
 
-        // Đặt cùng kích thước preferredSize cho hai panel
-        combinedTabPanel.preferredSize = Dimension(400, 300)
-        mirrorPanel.preferredSize = Dimension(400, 300)
+        combinedTabPanel.preferredSize = Dimension(650, 300)
+        mirrorPanel.preferredSize = Dimension(650, 400)
 
-        // Tạo container ngang cho tab + mirror
-        val tabAndMirrorContainer = JPanel(GridLayout(1, 2, 10, 0))
-        tabAndMirrorContainer.background = Color(60, 63, 65)
-        tabAndMirrorContainer.add(combinedTabPanel)
-        tabAndMirrorContainer.add(mirrorPanel)
+        val centerLayout = JPanel()
+        centerLayout.layout = BoxLayout(centerLayout, BoxLayout.X_AXIS) // horizontal
+        centerLayout.background = JBColor.GRAY
+        centerLayout.add(combinedTabPanel)
+        centerLayout.add(mirrorPanel)
+        centerLayout.add(screenInfoPanel)
 
-        // Tạo container ngang cho tab+mirror và screen info
-        val topPanelsLayout = JPanel()
-        topPanelsLayout.layout = BoxLayout(topPanelsLayout, BoxLayout.X_AXIS)
-        topPanelsLayout.background = Color(60, 63, 65)
-        topPanelsLayout.add(tabAndMirrorContainer)
-        topPanelsLayout.add(screenInfoPanel)
-
-        // Add the horizontal layout to the top section
-        topSection.add(topPanelsLayout, BorderLayout.CENTER)
-
-        // Bottom section with Graph and Log
-        val bottomSection = JPanel(BorderLayout())
-        bottomSection.background = Color(60, 63, 65)
-
-        // Create Graph and Log panels
+        // Graph and Log
         val graphPanelContainer = GraphPanel()
         val logPanelContainer = LogPanel()
 
-        // Bottom panels layout with Graph and Log side by side
-        val bottomPanelsLayout = JPanel()
-        bottomPanelsLayout.layout = BoxLayout(bottomPanelsLayout, BoxLayout.X_AXIS)
-        bottomPanelsLayout.background = Color(60, 63, 65)
+        val bottomLayout = JPanel()
+        bottomLayout.layout = BoxLayout(bottomLayout, BoxLayout.X_AXIS) // horizontal
+        bottomLayout.background = JBColor.GRAY
+        bottomLayout.add(graphPanelContainer)
+        bottomLayout.add(logPanelContainer)
 
-        // Add graph panel (wide) and log panel (narrow) side by side
-        bottomPanelsLayout.add(graphPanelContainer)
-        bottomPanelsLayout.add(logPanelContainer)
-        Log.i("","ggg")
+        // Todo: Use a vertical split pane to divide top and bottom sections with preferred ratios
 
-        // Add the bottom panels layout to the bottom section
-        bottomSection.add(bottomPanelsLayout, BorderLayout.CENTER)
-
-        // Use a vertical split pane to divide top and bottom sections with preferred ratios
-        val mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSection, bottomSection)
-        mainSplitPane.resizeWeight = 0.5 // Top panel gets 50% of space, bottom gets 50%
-        mainSplitPane.border = null
-        mainSplitPane.dividerSize = 5
-
-        // Add the split pane to main content
-        mainContentPanel.add(mainSplitPane, BorderLayout.CENTER)
-
-        // Add main content to window
-        add(mainContentPanel, BorderLayout.CENTER)
-
-        // Set default size
+        // Add main layout
+        background = JBColor.GRAY
+        add(topLayout, BorderLayout.NORTH)
+        add(centerLayout, BorderLayout.CENTER)
+        add(bottomLayout, BorderLayout.SOUTH)
         preferredSize = Dimension(1200, 700)
     }
 
-    private fun createTopToolbar(): JPanel {
+    private fun createTopToolBar(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.background = Color(60, 63, 65)
+        panel.background = JBColor.GRAY
 
-        // Title
         val titleLabel = JLabel("IUG Rule Maker Tool")
-        titleLabel.foreground = Color.WHITE
+        titleLabel.foreground = JBColor.WHITE
         titleLabel.border = JBUI.Borders.empty(5, 10)
         titleLabel.font = titleLabel.font.deriveFont(titleLabel.font.size + 2f)
-
-        // Buttons
-        val buttonsPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-        buttonsPanel.background = Color(60, 63, 65)
 
         val exportButton = JButton("Export")
         val importButton = JButton("Import")
         val exitButton = JButton("Exit")
 
+        exportButton.addActionListener {
+            onClickExportFileJson()
+        }
         importButton.addActionListener {
-//            openRuleFile()
+            onClickImportFileJson()
+        }
+        exitButton.addActionListener {
+            onClickExit()
         }
 
+        val buttonsPanel = JPanel(FlowLayout(FlowLayout.CENTER))
+        buttonsPanel.background = JBColor.GRAY
         buttonsPanel.add(exportButton)
         buttonsPanel.add(importButton)
         buttonsPanel.add(exitButton)
 
-        // User info
         val userPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
-        userPanel.background = Color(60, 63, 65)
-
-        val userLabel = JLabel("Hello, abcxyz ▼")
-        userLabel.foreground = Color.WHITE
+        userPanel.background = JBColor.GRAY
+        val userLabel = JLabel("Hello, $username ▼")
+        userLabel.foreground = JBColor.WHITE
         userLabel.border = JBUI.Borders.empty(5, 10)
         userPanel.add(userLabel)
 
-        // Add components to main panel
         panel.add(titleLabel, BorderLayout.WEST)
         panel.add(buttonsPanel, BorderLayout.CENTER)
         panel.add(userPanel, BorderLayout.EAST)
@@ -132,24 +100,15 @@ class IUGRuleMaker : JPanel(BorderLayout()) {
 
     private fun createCombinedTabPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.background = Color(60, 63, 65)
+        panel.background = JBColor.GRAY
 
-        // Create tabbed pane
         val tabbedPane = JTabbedPane()
-        tabbedPane.background = Color(60, 63, 65)
+        tabbedPane.background = JBColor.GRAY
         tabbedPane.foreground = JBColor.WHITE
 
-        // Create Common Info content
-        val commonInfoContent = CommonInfoPanel()
-
-        // Create Step Info content
-        val stepInfoContent = StepInfoPanel()
-
-        // Add tabs
         tabbedPane.addTab("Common Info", commonInfoContent)
         tabbedPane.addTab("Step Info", stepInfoContent)
 
-        // Set Common Info as default tab
         tabbedPane.selectedIndex = 0
 
         panel.add(tabbedPane, BorderLayout.CENTER)
@@ -157,4 +116,44 @@ class IUGRuleMaker : JPanel(BorderLayout()) {
 
         return panel
     }
+
+    private fun onClickImportFileJson() {
+        val filePath = "$path/rule.json"
+        rule = JsonHelper.readJson(filePath)
+    }
+
+    private fun onClickExportFileJson() {
+        val filePath = "$path/rule.json"
+        JsonHelper.writeJson(filePath, rule)
+    }
+
+    private fun onClickExit() {
+        // todo
+    }
+
+    private fun updateRule(newRule: Rule) {
+        rule = newRule
+    }
+
+    private fun updateLayoutStepInfo() {
+        // todo
+    }
+
+    private fun updateLayoutCommonInfo() {
+        // todo
+    }
+
+    private fun updateLayoutGraph() {
+        // todo
+    }
+
+    private fun nextStep() {
+
+    }
+
+    private fun previousStep() {
+
+    }
+
+
 }

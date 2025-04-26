@@ -6,6 +6,7 @@ import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextField
 import java.awt.*
 import java.io.File
@@ -29,23 +30,23 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
     init {
         val screenInfoBox = JPanel()
         screenInfoBox.layout = GroupLayout(screenInfoBox)
-        screenInfoBox.background = Color(60, 63, 65)
+        screenInfoBox.background = JBColor.GRAY
         screenInfoBox.border = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createLineBorder(JBColor.GRAY),
             "Screen information",
             TitledBorder.LEFT,
             TitledBorder.TOP,
             null,
-            Color.WHITE
+            JBColor.WHITE
         )
         val layout = screenInfoBox.layout as GroupLayout
         layout.autoCreateGaps = true
         layout.autoCreateContainerGaps = true
 
         val screenIdLabel = JLabel("screen id:")
-        screenIdLabel.foreground = Color.WHITE
+        screenIdLabel.foreground = JBColor.WHITE
         val packageNameLabel = JLabel("package name:")
-        packageNameLabel.foreground = Color.WHITE
+        packageNameLabel.foreground = JBColor.WHITE
         screenIdField.preferredSize = Dimension(160, 32)
         packageNameField.preferredSize = Dimension(160, 32)
         val applyButton = JButton("Apply")
@@ -98,7 +99,7 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
 
         // Control buttons căn giữa và lên cao một chút
         val controlPanel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10))
-        controlPanel.background = Color(60, 63, 65)
+        controlPanel.background = JBColor.GRAY
         controlPanel.add(captureButton)
         controlPanel.add(recordButton)
 
@@ -111,7 +112,7 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
         }
 
         // Panel phải dùng GridBagLayout để căn giữa box và đẩy controlPanel xuống cuối
-        background = Color(60, 63, 65)
+        background = JBColor.GRAY
         val gbc = GridBagConstraints()
 
         // Thêm box ở giữa cột
@@ -230,5 +231,4 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
             Messages.showErrorDialog(ex.message ?: "Stop recording failed", "Record Error")
         }
     }
-
 }

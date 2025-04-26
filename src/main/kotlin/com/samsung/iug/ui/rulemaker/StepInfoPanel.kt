@@ -16,7 +16,6 @@ import javax.swing.*
 import javax.swing.table.DefaultTableModel
 
 class StepInfoPanel(
-//    private val onStepUpdated: (Step) -> Unit,
     private var currentRule: Rule? = null
 ) : JPanel(BorderLayout()) {
 
@@ -31,31 +30,18 @@ class StepInfoPanel(
     private val layoutMatchersTable = createLayoutMatchersTable()
     private var currentStep: Step? = null
 
-    // Getters for fields
-    fun getIdField(): JBTextField = idField
-    fun getScreenIdField(): JBTextField = screenIdField
-    fun getGuideContentArea(): JTextArea = guideContentArea
-    fun getNextStepsField(): JBTextField = nextStepsField
-    fun getIsSubStepCheckbox(): JCheckBox = isSubStepCheckbox
-
     init {
-        val mainPanel = JPanel(BorderLayout())
-        val formPanel = createBasicInfoPanel()
+        val formPanel = createFormInfoPanel()
         val navigationPanel = createNavigationPanel()
 
-        mainPanel.add(formPanel, BorderLayout.CENTER)
-        mainPanel.add(navigationPanel, BorderLayout.SOUTH)
-
-        add(mainPanel, BorderLayout.CENTER)
+        add(formPanel, BorderLayout.NORTH)
+        add(layoutMatchersTable, BorderLayout.CENTER)
+        add(navigationPanel, BorderLayout.SOUTH)
     }
 
-    /**
-     * Create the basic information panel.
-     */
-    private fun createBasicInfoPanel(): JPanel {
+    private fun createFormInfoPanel(): JPanel {
         val panel = JPanel(BorderLayout())
 
-        // Create form
         val formPanel = FormBuilder.createFormBuilder()
             .addLabeledComponent("Step ID:", idField)
             .addLabeledComponent("Screen ID:", screenIdField)
@@ -68,18 +54,15 @@ class StepInfoPanel(
             .addComponentFillVertically(JPanel(), 0)
             .panel
 
-        // Add padding
         formPanel.border = JBUI.Borders.empty(10)
         panel.add(formPanel, BorderLayout.CENTER)
 
         return panel
     }
 
-    /**
-     * Create the layout matchers table.
-     */
     private fun createLayoutMatchersTable(): JBTable {
-        val columnNames = arrayOf("Target Type", "Match Value", "Match Criteria", "Highlight")
+        val columnNames =
+            arrayOf("Match Target", "Match Operand", "Match Criteria", "Highlight Type", "Transition Condition")
         val tableModel = DefaultTableModel(columnNames, 0)
 
         val table = JBTable(tableModel)
@@ -88,9 +71,6 @@ class StepInfoPanel(
         return table
     }
 
-    /**
-     * Create the navigation panel.
-     */
     private fun createNavigationPanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.CENTER))
 
@@ -110,14 +90,7 @@ class StepInfoPanel(
             }
         }
 
-        val saveButton = JButton("Save Changes").apply {
-            addActionListener {
-//                saveChanges()
-            }
-        }
-
         panel.add(prevStepButton)
-        panel.add(saveButton)
         panel.add(nextStepButton)
 
         panel.border = BorderFactory.createCompoundBorder(
@@ -128,10 +101,6 @@ class StepInfoPanel(
         return panel
     }
 
-
-    /**
-     * Navigate to the previous step
-     */
 //    fun onPreviousStep() {
 //        val currentStep = this.currentStep ?: return
 //        val rule = currentRule ?: return
@@ -161,10 +130,10 @@ class StepInfoPanel(
 //            }
 //        }
 //    }
-
-    /**
-     * Navigate to the next step
-     */
+//
+//    /**
+//     * Navigate to the next step
+//     */
 //    fun onNextStep() {
 //        val currentStep = this.currentStep ?: return
 //        val rule = currentRule ?: return
@@ -193,56 +162,56 @@ class StepInfoPanel(
 //            }
 //        }
 //    }
-
-    /**
-     * Update the layout matchers table with data from the current step.
-     */
-    private fun updateLayoutMatchersTable() {
-        val tableModel = layoutMatchersTable.model as DefaultTableModel
-        tableModel.rowCount = 0
-
-        val step = currentStep ?: return
-
-        for (matcher in step.layoutMatchers) {
-            tableModel.addRow(
-                arrayOf(
-                    matcher.matchTarget,
-                    matcher.matchOperand,
-                    matcher.matchCriteria,
-                    matcher.highlightType
-                )
-            )
-        }
-    }
-
-    /**
-     * Set the step to edit.
-     */
-    fun updateLayoutStep(step: Step) {
-        currentStep = step
-
-        idField.text = step.id
-        screenIdField.text = step.screenId
-        guideContentArea.text = step.guideContent
-        nextStepsField.text = step.nextStepIds.joinToString(", ")
-        isSubStepCheckbox.isSelected = step.isSubStep
-
-        updateLayoutMatchersTable()
-
-        idField.isEditable = true
-        screenIdField.isEditable = true
-    }
-
-    /**
-     * Set the current rule for reference.
-     */
-    fun setRule(rule: Rule) {
-        currentRule = rule
-    }
-
-    /**
-     * Save changes to the current step.
-     */
+//
+//    /**
+//     * Update the layout matchers table with data from the current step.
+//     */
+//    private fun updateLayoutMatchersTable() {
+//        val tableModel = layoutMatchersTable.model as DefaultTableModel
+//        tableModel.rowCount = 0
+//
+//        val step = currentStep ?: return
+//
+//        for (matcher in step.layoutMatchers) {
+//            tableModel.addRow(
+//                arrayOf(
+//                    matcher.matchTarget,
+//                    matcher.matchOperand,
+//                    matcher.matchCriteria,
+//                    matcher.highlightType
+//                )
+//            )
+//        }
+//    }
+//
+//    /**
+//     * Set the step to edit.
+//     */
+//    fun updateLayoutStep(step: Step) {
+//        currentStep = step
+//
+//        idField.text = step.id
+//        screenIdField.text = step.screenId
+//        guideContentArea.text = step.guideContent
+//        nextStepsField.text = step.nextStepIds.joinToString(", ")
+//        isSubStepCheckbox.isSelected = step.isSubStep
+//
+//        updateLayoutMatchersTable()
+//
+//        idField.isEditable = true
+//        screenIdField.isEditable = true
+//    }
+//
+//    /**
+//     * Set the current rule for reference.
+//     */
+//    fun setRule(rule: Rule) {
+//        currentRule = rule
+//    }
+//
+//    /**
+//     * Save changes to the current step.
+//     */
 //    fun saveChanges() {
 //        if (currentStep == null) return
 //
@@ -306,42 +275,42 @@ class StepInfoPanel(
 //            JOptionPane.INFORMATION_MESSAGE
 //        )
 //    }
-
-    /**
-     * Create a new step with initial values.
-     * isSubStep is now managed internally via RuleMakerWindow.identifyMainPathAndSetSubSteps,
-     * but we still keep the UI control to allow manual override.
-     */
-    fun createNewStep(isSubStep: Boolean = false): Step {
-        val newStepId = "step_${System.currentTimeMillis()}"
-        val step = Step(
-            id = newStepId,
-            screenId = "com.example.activity",
-            guideContent = "New step",
-            isSubStep = isSubStep
-        )
-
-        // Set for editing
-        updateLayoutStep(step)
-
-        // ID should be editable for new steps
-        idField.isEditable = true
-
-        return step
-    }
-
-    /**
-     * Reset the form.
-     */
-    fun reset() {
-        currentStep = null
-        idField.text = ""
-        screenIdField.text = ""
-        guideContentArea.text = ""
-        nextStepsField.text = ""
-        isSubStepCheckbox.isSelected = false
-
-        val tableModel = layoutMatchersTable.model as DefaultTableModel
-        tableModel.rowCount = 0
-    }
+//
+//    /**
+//     * Create a new step with initial values.
+//     * isSubStep is now managed internally via RuleMakerWindow.identifyMainPathAndSetSubSteps,
+//     * but we still keep the UI control to allow manual override.
+//     */
+//    fun createNewStep(isSubStep: Boolean = false): Step {
+//        val newStepId = "step_${System.currentTimeMillis()}"
+//        val step = Step(
+//            id = newStepId,
+//            screenId = "com.example.activity",
+//            guideContent = "New step",
+//            isSubStep = isSubStep
+//        )
+//
+//        // Set for editing
+//        updateLayoutStep(step)
+//
+//        // ID should be editable for new steps
+//        idField.isEditable = true
+//
+//        return step
+//    }
+//
+//    /**
+//     * Reset the form.
+//     */
+//    fun reset() {
+//        currentStep = null
+//        idField.text = ""
+//        screenIdField.text = ""
+//        guideContentArea.text = ""
+//        nextStepsField.text = ""
+//        isSubStepCheckbox.isSelected = false
+//
+//        val tableModel = layoutMatchersTable.model as DefaultTableModel
+//        tableModel.rowCount = 0
+//    }
 } 
