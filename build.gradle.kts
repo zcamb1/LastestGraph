@@ -1,23 +1,34 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.8.21"
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.kotlin.jvm") version "1.9.25"
+    id("org.jetbrains.intellij") version "1.17.4"
 }
 
-group = "com.samsung"
+group = "com.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    localPath.set("E:\\Program\\Android\\Android Studio 2023")
-    type.set("AI") // Target IDE Platform
+    localPath.set("D:/Install/Android/Android Studio 2023")
+    plugins.set(listOf("android"))
+}
 
-    plugins.set(listOf("Kotlin", "android"))
+dependencies {
+    implementation("com.android.tools.ddms:ddmlib:25.3.0")
+    implementation("com.android.tools:sdk-common:25.3.0")
+    implementation("org.bytedeco:javacv:1.5.8")
+    implementation("org.bytedeco:javacv-platform:1.5.8")
+    implementation("org.bytedeco:ffmpeg:5.1.2-1.5.8")
+}
+
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks {
@@ -31,8 +42,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("222")
-        untilBuild.set("232.*")
+        sinceBuild.set("232")
+        untilBuild.set("243.*")
     }
 
     signPlugin {
@@ -45,15 +56,20 @@ tasks {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
 
+    runIde {
+
+        ideDir.set(file("D:/Install/Android/Android Studio 2023"))
+    }
+
     instrumentCode {
+        enabled = false
+    }
+
+    instrumentTestCode {
         enabled = false
     }
 
     buildSearchableOptions{
         enabled = false
-    }
-
-    runIde{
-        ideDir.set(file("E:\\Program\\Android\\Android Studio 2023"))
     }
 }
