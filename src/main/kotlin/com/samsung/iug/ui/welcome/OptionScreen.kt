@@ -1,4 +1,4 @@
-package com.example
+package com.samsung.iug.ui.welcome
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.util.IconLoader

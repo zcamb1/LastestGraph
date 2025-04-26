@@ -1,4 +1,4 @@
-package com.example
+package com.samsung.iug.ui.welcome
 
 import com.intellij.ide.util.PropertiesComponent
 import javax.swing.JLabel
@@ -12,9 +12,8 @@ import javax.swing.JButton
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
-class OpenScreen(val path: String, val userName: String, private val onLogoutCallback: () -> Unit) : JPanel(BorderLayout()) {
+class CreateScreen(val path: String, val userName: String, private val onLogoutCallback: () -> Unit) : JPanel(BorderLayout()) {
     init {
-
         val topBar = JPanel(BorderLayout())
         topBar.border = BorderFactory.createEmptyBorder(10, 20, 10, 20)
 
@@ -54,7 +53,7 @@ class OpenScreen(val path: String, val userName: String, private val onLogoutCal
         topBar.add(userPanel, BorderLayout.EAST)
 
         add(topBar, BorderLayout.NORTH)
-        add(JLabel("🎉 Opened project at: $path"), BorderLayout.CENTER)
+        add(JLabel("🎉 Created project at: $path"), BorderLayout.CENTER)
     }
     private fun onLogout() {
         onLogoutCallback() // <-- gọi về cha (BrowserPanel)

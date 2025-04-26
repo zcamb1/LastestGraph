@@ -1,5 +1,6 @@
-package com.example
+package com.samsung.iug.ui.login
 
+import com.samsung.iug.ui.welcome.OptionScreen
 import com.intellij.ide.util.PropertiesComponent
 //import javafx.application.Platform
 //import javafx.embed.swing.JFXPanel
@@ -13,6 +14,7 @@ import javax.swing.border.EmptyBorder
 class BrowserPanel : JPanel(BorderLayout()){
 
     private val panel = JPanel(BorderLayout())
+//    TODO can not run on SRV
 //    private var jfxPanel: JFXPanel? = null
 //    private var webEngine: WebEngine? = null
 
@@ -23,8 +25,6 @@ class BrowserPanel : JPanel(BorderLayout()){
     init {
         showLoginButton()
     }
-
-
 
     private fun showLoginButton() {
         // Tạo tiêu đề
@@ -42,8 +42,9 @@ class BrowserPanel : JPanel(BorderLayout()){
         button.font = Font("Arial", Font.BOLD, 16)
 
         button.addActionListener {
-//            skip login step, if you want to login, remove comment and comment showMainUI() in last line
 
+//            TODO can not run on SRV
+//            skip login step, if you want to login, remove comment and comment showMainUI() in last line
 //            if (props.getBoolean(LOGIN_KEY, false)) {
 //                // Nếu đã đăng nhập từ trước, bỏ qua đăng nhập
 //                showMainUI()
@@ -63,7 +64,6 @@ class BrowserPanel : JPanel(BorderLayout()){
 
         // Wrapper chính
         val wrapper = JPanel(BorderLayout())
-//        wrapper.background = Color.WHITE
         wrapper.add(titleLabel, BorderLayout.NORTH)
         wrapper.add(buttonPanel, BorderLayout.CENTER)
 
@@ -74,7 +74,7 @@ class BrowserPanel : JPanel(BorderLayout()){
     }
 
 
-
+// TODO can not run on SRV
 //    private fun openLoginPage() {
 //        if (jfxPanel != null) return
 //
@@ -127,7 +127,6 @@ class BrowserPanel : JPanel(BorderLayout()){
         panel.revalidate()
         panel.repaint()
     }
-
 
     fun getComponent(): JComponent = panel
 }
