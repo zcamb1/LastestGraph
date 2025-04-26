@@ -33,6 +33,14 @@ object GetDevice {
             }
         }
 
+        val previousSelection: String? = comboBox.selectedItem?.toString()
+        if (previousSelection != "None") {
+            val serial = getSerialFromName(previousSelection.toString())
+            if (serial != null && serial != "None") {
+                device = serial
+            }
+        }
+
         comboBox.preferredSize = Dimension(200, 30)
         panel.add(comboBox)
 

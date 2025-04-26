@@ -17,7 +17,8 @@ object ScreenMirror {
     private var isStream = false
 
     init {
-        panel.add(imageLabel, BorderLayout.WEST)
+        panel.add(imageLabel, BorderLayout.CENTER)
+        imageLabel.setSize(400, 600)
     }
 
     fun getDeviceScreenSizeDdmlib(device: String): Pair<Int, Int> {
@@ -133,7 +134,7 @@ object ScreenMirror {
 
                         SwingUtilities.invokeLater {
                             imageLabel.icon = ImageIcon(bufferedImage)
-                            imageLabel.setBounds(0, 0, bufferedImage.width, bufferedImage.height)
+                            imageLabel.setSize(bufferedImage.width, bufferedImage.height)
                         }
                     }
 
