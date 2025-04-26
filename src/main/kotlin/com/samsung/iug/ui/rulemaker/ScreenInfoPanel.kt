@@ -13,6 +13,12 @@ class ScreenInfoPanel : JPanel(BorderLayout()) {
         isEditable = true
     }
 
+    private val captureButton = JButton("Capture")
+    private val recordButton = JButton("Record")
+
+    private var recordingProcess: Process? = null
+    private var savedRecordingFile: File? = null
+
     init {
         val screenInfoBox = JPanel()
         screenInfoBox.layout = GroupLayout(screenInfoBox)
@@ -86,10 +92,16 @@ class ScreenInfoPanel : JPanel(BorderLayout()) {
         // Control buttons căn giữa và lên cao một chút
         val controlPanel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10))
         controlPanel.background = Color(60, 63, 65)
-        val captureButton = JButton("Capture")
-        val recordButton = JButton("Record")
         controlPanel.add(captureButton)
         controlPanel.add(recordButton)
+
+        captureButton.addActionListener {
+            captureScreen()
+        }
+
+        recordButton.addActionListener {
+            toggleRecording()
+        }
 
         // Panel phải dùng GridBagLayout để căn giữa box và đẩy controlPanel xuống cuối
         background = Color(60, 63, 65)
@@ -125,4 +137,91 @@ class ScreenInfoPanel : JPanel(BorderLayout()) {
 
         preferredSize = Dimension(290, 300)
     }
+
+    private fun captureScreen() {
+        if (!DeviceManager.isAdbDeviceConnected()) {
+            Messages.showErrorDialog("No device connected.\nPlease connect a device via ADB.", "ADB Error")
+            return
+        }
+
+        try {
+            val descriptor = FileSaverDescriptor("Save Screenshot", "Save as PNG", "png")
+            val fileWrapper = FileChooserFactory.getInstance()
+                .createSaveFileDialog(descriptor, null)
+                .save(null as VirtualFile?, "screenshot.png")
+
+            fileWrapper?.file?.let { outputFile ->
+                captureScreenAndSave(outputFile)
+                Messages.showInfoMessage("Screenshot saved: ${outputFile.absolutePath}", "Capture Success")
+            }
+        } catch (ex: Exception) {
+            Messages.showErrorDialog(ex.message ?: "Capture failed", "Capture Error")
+        }
+    }
+
+    private fun captureScreenAndSave(outputFile: File) {
+        val process = ProcessBuilder("adb", "exec-out", "screencap", "-p").start()
+        val imageBytes = process.inputStream.readBytes()
+
+        outputFile.outputStream().use {
+            it.write(imageBytes)
+        }
+
+        VfsUtil.markDirtyAndRefresh(false, false, false, outputFile)
+    }
+
+    private fun toggleRecording() {
+        if (!DeviceManager.isAdbDeviceConnected()) {
+            Messages.showErrorDialog("No device connected.\nPlease connect a device via ADB.", "ADB Error")
+            return
+        }
+        if (recordingProcess == null) {
+            startRecording()
+        } else {
+            stopRecording()
+        }
+    }
+
+    private fun startRecording() {
+        try {
+            val descriptor = FileSaverDescriptor("Save Recording", "Save as MP4", "mp4")
+            val fileWrapper = FileChooserFactory.getInstance()
+                .createSaveFileDialog(descriptor, null)
+                .save(null as VirtualFile?, "recording.mp4")
+
+            fileWrapper?.file?.let { outputFile ->
+                savedRecordingFile = outputFile
+                recordingProcess = ProcessBuilder("adb", "shell", "screenrecord", "/sdcard/demo.mp4").start()
+
+                recordButton.text = "Stop"
+                Messages.showInfoMessage("Recording started. Press 'Stop Record' to finish.", "Recording")
+            }
+        } catch (ex: Exception) {
+            Messages.showErrorDialog(ex.message ?: "Start recording failed", "Record Error")
+        }
+    }
+
+    private fun stopRecording() {
+        try {
+            ProcessBuilder("adb", "shell", "pkill", "-l2", "screenrecord").start().waitFor()
+            recordingProcess?.waitFor()
+            recordingProcess = null
+
+            savedRecordingFile?.let { outputFile ->
+                val pullProcess = ProcessBuilder("adb", "pull", "/sdcard/demo.mp4", outputFile.absolutePath).start()
+                pullProcess.waitFor()
+
+                ProcessBuilder("adb", "shell", "rm", "/sdcard/demo.mp4").start().waitFor()
+
+                VfsUtil.markDirtyAndRefresh(false, false, false, outputFile)
+
+                Messages.showInfoMessage("Recording saved: ${outputFile.absolutePath}", "Record Success")
+            }
+
+            recordButton.text = "Start"
+        } catch (ex: Exception) {
+            Messages.showErrorDialog(ex.message ?: "Stop recording failed", "Record Error")
+        }
+    }
+
 }
