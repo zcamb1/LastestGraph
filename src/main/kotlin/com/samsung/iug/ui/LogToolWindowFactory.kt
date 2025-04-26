@@ -1,4 +1,4 @@
-package com.samsung.iug.ui
+package com.example.demologplugin
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow

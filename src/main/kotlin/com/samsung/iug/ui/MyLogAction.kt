@@ -1,4 +1,4 @@
-package com.samsung.iug.ui
+package com.example.demologplugin
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent

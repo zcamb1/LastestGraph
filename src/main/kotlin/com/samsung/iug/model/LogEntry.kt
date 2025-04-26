@@ -1,4 +1,4 @@
-package com.samsung.iug.model
+package com.example.demologplugin
 
 data class LogEntry(
     val timestamp: String,

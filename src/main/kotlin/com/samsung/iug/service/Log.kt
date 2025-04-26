@@ -1,4 +1,4 @@
-package com.samsung.iug.model.service
+package com.example.demologplugin
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

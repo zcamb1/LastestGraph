@@ -37,7 +37,7 @@
     //temp added
     <actions>
         <action id="MyPlugin.MyLogAction"
-                class="com.samsung.iug.ui.MyLogAction"
+                class="com.example.demologplugin.MyLogAction"
                 text="Test Log"
                 description="Write a test log message">
             <add-to-group group-id="ToolsMenu" anchor="last"/>

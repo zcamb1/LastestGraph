@@ -1,4 +1,4 @@
-package com.samsung.iug.model
+package com.example.demologplugin
 
 enum class LogLevel(val label: String) {
     DEBUG("DEBUG"),

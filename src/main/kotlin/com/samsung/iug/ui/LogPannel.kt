@@ -1,4 +1,4 @@
-package com.samsung.iug.ui
+package com.example.demologplugin
 
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBList
