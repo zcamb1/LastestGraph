@@ -10,7 +10,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
-
+// hihi haha
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
