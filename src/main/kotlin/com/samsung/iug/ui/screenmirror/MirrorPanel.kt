@@ -9,11 +9,10 @@ import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 
-class MirrorPanel: JPanel(BorderLayout()) {
+class MirrorPanel : JPanel(BorderLayout()) {
     private var commonInfoContent = CommonInfoPanel()
 
     init {
-
         val screenInfoPanel = ScreenInfoPanel {
             commonInfoContent.updatePackageName(it)
         }
@@ -26,9 +25,13 @@ class MirrorPanel: JPanel(BorderLayout()) {
         add(GetDevice.panel, BorderLayout.NORTH)
         add(ScreenMirror.panel, BorderLayout.WEST)
 
-        val infoPanel = JPanel()
-        val infoLayout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-        infoPanel.layout = infoLayout
+        val infoPanel = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY, 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            )
+        }
         add(infoPanel, BorderLayout.EAST)
         infoPanel.add(screenInfoPanel)
         infoPanel.add(LayoutInspectorPanel())

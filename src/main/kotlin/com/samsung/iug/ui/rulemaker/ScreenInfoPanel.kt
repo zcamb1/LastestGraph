@@ -6,7 +6,6 @@ import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextField
 import com.samsung.iug.service.Log
 import com.samsung.iug.ui.screenmirror.GetDevice
@@ -33,25 +32,26 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
     private var savedRecordingFile: File? = null
 
     init {
-        val screenInfoBox = JPanel()
-        screenInfoBox.layout = GroupLayout(screenInfoBox)
-        screenInfoBox.background = JBColor.GRAY
-        screenInfoBox.border = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(JBColor.GRAY),
-            "Screen information",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            null,
-//            JBColor.WHITE
-        )
-        val layout = screenInfoBox.layout as GroupLayout
-        layout.autoCreateGaps = true
-        layout.autoCreateContainerGaps = true
+        val screenInfoBox = JPanel().apply {
+            layout = GroupLayout(this)
+            border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                "Screen information",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                null,
+                Color.WHITE
+            )
+            preferredSize = Dimension(260, 160)
+            maximumSize = Dimension(320, 180)
+        }
+
+        val screenInfoLayout = screenInfoBox.layout as GroupLayout
+        screenInfoLayout.autoCreateGaps = true
+        screenInfoLayout.autoCreateContainerGaps = true
 
         val screenIdLabel = JLabel("Screen id:")
-//        screenIdLabel.foreground = JBColor.WHITE
         val packageNameLabel = JLabel("Package name:")
-//        packageNameLabel.foreground = JBColor.WHITE
         screenIdField.preferredSize = Dimension(160, 32)
         packageNameField.preferredSize = Dimension(160, 32)
         AdbManager.getTopResumedActivity(GetDevice.device, screenIdField, packageNameField)
@@ -80,24 +80,24 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
             }
         }
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+        screenInfoLayout.setHorizontalGroup(
+            screenInfoLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
                 .addGroup(
-                    layout.createSequentialGroup()
+                    screenInfoLayout.createSequentialGroup()
                         .addGroup(
-                            layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            screenInfoLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                 .addComponent(screenIdLabel)
                                 .addComponent(packageNameLabel)
                         )
                         .addGroup(
-                            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            screenInfoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addGroup(
-                                    layout.createSequentialGroup()
+                                    screenInfoLayout.createSequentialGroup()
                                         .addComponent(screenIdField)
                                         .addComponent(screenIdCopyButton)
                                 )
                                 .addGroup(
-                                    layout.createSequentialGroup()
+                                    screenInfoLayout.createSequentialGroup()
                                         .addComponent(packageNameField)
                                         .addComponent(packageNameCopyButton)
                                 )
@@ -110,16 +110,16 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
                     GroupLayout.PREFERRED_SIZE
                 )
         )
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
+        screenInfoLayout.setVerticalGroup(
+            screenInfoLayout.createSequentialGroup()
                 .addGroup(
-                    layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    screenInfoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(screenIdLabel)
                         .addComponent(screenIdField)
                         .addComponent(screenIdCopyButton)
                 )
                 .addGroup(
-                    layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    screenInfoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(packageNameLabel)
                         .addComponent(packageNameField)
                         .addComponent(packageNameCopyButton)
@@ -132,14 +132,13 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
                     GroupLayout.PREFERRED_SIZE
                 )
         )
-        screenInfoBox.preferredSize = Dimension(260, 160)
-        screenInfoBox.maximumSize = Dimension(320, 180)
 
-        // Control buttons căn giữa và lên cao một chút
-        val controlPanel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10))
-        controlPanel.background = JBColor.GRAY
-        controlPanel.add(captureButton)
-        controlPanel.add(recordButton)
+
+        // Control buttons
+        val controlPanel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10)).apply {
+            add(captureButton)
+            add(recordButton)
+        }
 
         captureButton.addActionListener {
             captureScreen()
@@ -149,8 +148,7 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
             toggleRecording()
         }
 
-        // Panel phải dùng GridBagLayout để căn giữa box và đẩy controlPanel xuống cuối
-        background = JBColor.GRAY
+        // Main layout
         val gbc = GridBagConstraints()
 
         // Thêm box ở giữa cột
@@ -171,6 +169,7 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         gbc2.anchor = GridBagConstraints.SOUTH
         gbc2.fill = GridBagConstraints.NONE
         add(controlPanel, gbc2)
+
         // Thêm khoảng cách phía dưới controlPanel
         val gbc3 = GridBagConstraints()
         gbc3.gridx = 0
@@ -183,6 +182,7 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
 
         preferredSize = Dimension(290, 300)
     }
+
     override fun removeNotify() {
         super.removeNotify()
         AdbManager.stopListeningActivityChanges()

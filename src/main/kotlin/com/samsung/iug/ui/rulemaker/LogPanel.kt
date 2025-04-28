@@ -10,6 +10,10 @@ import java.awt.datatransfer.StringSelection
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.BorderFactory
+import javax.swing.JPanel
+import javax.swing.border.TitledBorder
+import java.awt.*
 
 class LogPanel : JPanel(BorderLayout()) {
     private val allLogs = mutableListOf<LogEntry>()
@@ -20,6 +24,15 @@ class LogPanel : JPanel(BorderLayout()) {
     private val tagFilterField = JTextField(15)
 
     init {
+        border = BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.GRAY),
+            "Log",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            null,
+            Color.WHITE
+        )
+
         // Top control panel
         val controls = JPanel(FlowLayout(FlowLayout.LEFT))
         controls.add(JLabel("Level:"))

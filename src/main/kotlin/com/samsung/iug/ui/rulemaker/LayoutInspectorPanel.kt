@@ -7,7 +7,7 @@ import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.border.TitledBorder
 
-class LayoutInspectorPanel: JPanel(BorderLayout()) {
+class LayoutInspectorPanel : JPanel(BorderLayout()) {
     init {
         border = BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Color.GRAY),
@@ -16,8 +16,7 @@ class LayoutInspectorPanel: JPanel(BorderLayout()) {
             TitledBorder.TOP,
             null
         )
-        background = Color.GRAY
-
-        preferredSize = Dimension(300, 100)
+        preferredSize = Dimension(260, 100)
+        maximumSize = Dimension(320, 100)
     }
 }

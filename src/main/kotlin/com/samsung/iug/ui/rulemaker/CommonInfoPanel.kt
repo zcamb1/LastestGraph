@@ -1,10 +1,10 @@
 package com.samsung.iug.ui.rulemaker
 
-import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import java.awt.*
 
 class CommonInfoPanel(var data: String = "\n\"packageName\": abc\n") : JPanel(BorderLayout()) {
     private val commonInfoArea = JTextArea("{$data}").apply {
@@ -13,7 +13,7 @@ class CommonInfoPanel(var data: String = "\n\"packageName\": abc\n") : JPanel(Bo
     }
 
     init {
-        background = JBColor.GRAY
+        background = Color.DARK_GRAY
         add(JBScrollPane(commonInfoArea), BorderLayout.CENTER)
     }
 

@@ -1,6 +1,5 @@
 package com.samsung.iug.ui.rulemaker
 
-import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
 import com.samsung.iug.model.Rule
 import com.samsung.iug.model.Step
@@ -9,6 +8,7 @@ import com.samsung.iug.ui.screenmirror.MirrorPanel
 import com.samsung.iug.utils.JsonHelper
 import java.awt.*
 import javax.swing.*
+import javax.swing.border.TitledBorder
 
 class IUGRuleMaker(private val path: String, private val username: String) : JPanel(BorderLayout()) {
 
@@ -18,52 +18,65 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
     private lateinit var currentStep: Step
 
     init {
+        val maxWidth = 1200
+        val maxHeight = 800
+
         // Top bar
-        val topLayout = createTopToolBar()
+        val topLayout = createTopToolBar().apply {
+            preferredSize = Dimension(maxWidth, 50)
+        }
 
-        // Common Info, Step Info, Mirror, Screen Info
-        val combinedTabPanel = createCombinedTabPanel()
-        val mirrorPanel = MirrorPanel()
+        // Center layout: Common Info, Step Info, Mirror, Screen Info
+        val combinedTabPanel = createCombinedTabPanel().apply {
+            preferredSize = Dimension(300, 650)
+        }
+        val mirrorPanel = MirrorPanel().apply {
+            preferredSize = Dimension(500, 650)
+        }
 
-
-        combinedTabPanel.preferredSize = Dimension(300, 650)
-        mirrorPanel.preferredSize = Dimension(400, 650)
-
-        val centerLayout = JPanel()
-        centerLayout.layout = BoxLayout(centerLayout, BoxLayout.X_AXIS) // horizontal
-        centerLayout.background = JBColor.GRAY
-        centerLayout.add(combinedTabPanel)
-        centerLayout.add(mirrorPanel)
+        val centerLayout = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS) // horizontal
+            background = Color.DARK_GRAY
+            add(combinedTabPanel)
+            add(mirrorPanel)
+            preferredSize = Dimension(maxWidth, 650)
+        }
 
         // Graph and Log
-        val graphPanelContainer = GraphPanel()
-        val logPanelContainer = LogPanel()
+        val graphPanelContainer = GraphPanel().apply {
+            preferredSize = Dimension(800, 250)
+        }
+        val logPanelContainer = LogPanel().apply {
+            preferredSize = Dimension(400, 250)
+        }
         Log.init(logPanelContainer)
 
-        val bottomLayout = JPanel()
-        bottomLayout.layout = BoxLayout(bottomLayout, BoxLayout.X_AXIS) // horizontal
-        bottomLayout.background = JBColor.GRAY
-        bottomLayout.add(graphPanelContainer)
-        bottomLayout.add(logPanelContainer)
+        val bottomLayout = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS) // horizontal
+            background = Color.DARK_GRAY
+            add(graphPanelContainer)
+            add(logPanelContainer)
+            preferredSize = Dimension(maxWidth, 250)
+        }
 
         // Todo: Use a vertical split pane to divide top and bottom sections with preferred ratios
 
         // Add main layout
-        background = JBColor.GRAY
+        background = Color.DARK_GRAY
         add(topLayout, BorderLayout.NORTH)
         add(centerLayout, BorderLayout.CENTER)
         add(bottomLayout, BorderLayout.SOUTH)
     }
 
     private fun createTopToolBar(): JPanel {
-        val panel = JPanel(BorderLayout())
-        panel.background = JBColor.GRAY
+        // Title
+        val titleLabel = JLabel("IUG Rule Maker Tool").apply {
+            foreground = Color.WHITE
+            border = JBUI.Borders.empty(5, 10)
+            font = font.deriveFont(font.size + 2f)
+        }
 
-        val titleLabel = JLabel("IUG Rule Maker Tool")
-        titleLabel.foreground = JBColor.WHITE
-        titleLabel.border = JBUI.Borders.empty(5, 10)
-        titleLabel.font = titleLabel.font.deriveFont(titleLabel.font.size + 2f)
-
+        // Button
         val exportButton = JButton("Export")
         val importButton = JButton("Import")
         val exitButton = JButton("Exit")
@@ -78,41 +91,50 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
             onClickExit()
         }
 
-        val buttonsPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-        buttonsPanel.background = JBColor.GRAY
-        buttonsPanel.add(exportButton)
-        buttonsPanel.add(importButton)
-        buttonsPanel.add(exitButton)
+        // Info user
+        val userLabel = JLabel("Hello, $username ▼").apply {
+            foreground = Color.WHITE
+            border = JBUI.Borders.empty(5, 10)
+        }
 
-        val userPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
-        userPanel.background = JBColor.GRAY
-        val userLabel = JLabel("Hello, $username ▼")
-        userLabel.foreground = JBColor.WHITE
-        userLabel.border = JBUI.Borders.empty(5, 10)
-        userPanel.add(userLabel)
+        val buttonsPanel = JPanel(FlowLayout(FlowLayout.CENTER)).apply {
+            add(exportButton)
+            add(importButton)
+            add(exitButton)
+        }
 
-        panel.add(titleLabel, BorderLayout.WEST)
-        panel.add(buttonsPanel, BorderLayout.CENTER)
-        panel.add(userPanel, BorderLayout.EAST)
+        val userPanel = JPanel(FlowLayout(FlowLayout.RIGHT)).apply {
+            add(userLabel)
+        }
+
+        val panel = JPanel(BorderLayout()).apply {
+            add(titleLabel, BorderLayout.WEST)
+            add(buttonsPanel, BorderLayout.CENTER)
+            add(userPanel, BorderLayout.EAST)
+        }
 
         return panel
     }
 
     private fun createCombinedTabPanel(): JPanel {
-        val panel = JPanel(BorderLayout())
-        panel.background = JBColor.GRAY
+        val tabbedPane = JTabbedPane().apply {
+            foreground = Color.WHITE
+            addTab("Common Info", commonInfoContent)
+            addTab("Step Info", stepInfoContent)
+            selectedIndex = 0
+        }
 
-        val tabbedPane = JTabbedPane()
-        tabbedPane.background = JBColor.GRAY
-        tabbedPane.foreground = JBColor.WHITE
-
-        tabbedPane.addTab("Common Info", commonInfoContent)
-        tabbedPane.addTab("Step Info", stepInfoContent)
-
-        tabbedPane.selectedIndex = 0
-
-        panel.add(tabbedPane, BorderLayout.CENTER)
-        panel.preferredSize = Dimension(580, 300)
+        val panel = JPanel(BorderLayout()).apply {
+            add(tabbedPane, BorderLayout.CENTER)
+            border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                "",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                null,
+                Color.WHITE
+            )
+        }
 
         return panel
     }
