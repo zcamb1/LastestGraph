@@ -1,6 +1,9 @@
 package com.samsung.iug.ui.rulemaker
 
+import com.intellij.openapi.project.Project
 import com.intellij.util.ui.JBUI
+import com.samsung.iug.logic.EditorPanelLogic
+import com.samsung.iug.logic.NodeInteractionLogic
 import com.samsung.iug.model.Rule
 import com.samsung.iug.model.Step
 import com.samsung.iug.service.Log
@@ -9,13 +12,43 @@ import com.samsung.iug.utils.JsonHelper
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
-
-class IUGRuleMaker(private val path: String, private val username: String) : JPanel(BorderLayout()) {
+import com.samsung.iug.utils.RuleParser
+import com.samsung.iug.logic.TopToolbarLogic
+class IUGRuleMaker(private val path: String, private val username: String,private val project: Project) : JPanel(BorderLayout()) {
 
     private lateinit var rule: Rule
     private var commonInfoContent = CommonInfoPanel()
-    private var stepInfoContent = StepInfoPanel()
     private lateinit var currentStep: Step
+    private var currentRule: Rule? = null
+    private val ruleParser = RuleParser()
+    private val editorLogic: EditorPanelLogic = EditorPanelLogic(::onStepUpdated)
+    private val stepInfoPanel: StepInfoPanel = StepInfoPanel(editorLogic)
+    private val topToolbarLogic = TopToolbarLogic(
+        project,
+        ruleParser,
+        ::setRule,
+        { currentRule }
+    )
+    private val nodeLogic: NodeInteractionLogic = NodeInteractionLogic(
+        getCurrentRule = { currentRule },
+        setRule = { rule -> currentRule = rule },
+        refreshGraph = { graphPanel.refreshGraph() },
+        showStepInEditor = { step -> stepInfoPanel.setStep(step) },
+        createNewStep = { isSubStep -> editorLogic.createNewStep(isSubStep) },
+        getCellForStep = { stepId -> graphPanel.getCellForStep(stepId) },
+        getCellGeometry = { cell -> graphPanel.getCellGeometry(cell) },
+        setCellGeometry = { cell, geo -> graphPanel.setCellGeometry(cell, geo) },
+        showMessage = { msg, title, type -> JOptionPane.showMessageDialog(this, msg, title, type) }
+    )
+
+    private val graphPanel: GraphPanelMain = GraphPanelMain(
+        onStepSelected = { step -> nodeLogic.onStepSelected(step) },
+        onAddStep = { parentStep, parentCell, parentGeo ->
+            nodeLogic.onAddStep(parentStep, parentCell, parentGeo)
+        },
+        onAddSubStep = { parentStep -> nodeLogic.onAddSubStep(parentStep) },
+        onRemoveStep = { step -> nodeLogic.onRemoveStep(step) }
+    ) { stepA, swapId -> nodeLogic.onSwapNode(stepA, swapId) }
 
     init {
         val maxWidth = 1200
@@ -43,7 +76,7 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         }
 
         // Graph and Log
-        val graphPanelContainer = GraphPanel().apply {
+        val graphPanelContainer = createGraphPanel().apply {
             preferredSize = Dimension(800, 250)
         }
         val logPanelContainer = LogPanel().apply {
@@ -68,6 +101,28 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         add(bottomLayout, BorderLayout.SOUTH)
     }
 
+    private fun createGraphPanel(): JPanel {
+        val panel = JPanel(BorderLayout())
+        panel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.GRAY),
+            "Step graph",
+            TitledBorder.LEFT,
+            TitledBorder.TOP,
+            null,
+            Color.WHITE
+        )
+        panel.background = Color(60, 63, 65)
+
+        // Make sure the graph is visible
+        graphPanel.preferredSize = Dimension(950, 220)
+        panel.add(graphPanel, BorderLayout.CENTER)
+
+        // Set preferred size for the graph panel container
+        panel.preferredSize = Dimension(900, 250)
+
+        return panel
+    }
+
     private fun createTopToolBar(): JPanel {
         // Title
         val titleLabel = JLabel("IUG Rule Maker Tool").apply {
@@ -82,13 +137,13 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         val exitButton = JButton("Exit")
 
         exportButton.addActionListener {
-            onClickExportFileJson()
+            topToolbarLogic.exportRule(this)
         }
         importButton.addActionListener {
-            onClickImportFileJson()
+            topToolbarLogic.importRule()
         }
         exitButton.addActionListener {
-            onClickExit()
+            topToolbarLogic.exitApplication()
         }
 
         // Info user
@@ -120,7 +175,7 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         val tabbedPane = JTabbedPane().apply {
             foreground = Color.WHITE
             addTab("Common Info", commonInfoContent)
-            addTab("Step Info", stepInfoContent)
+            addTab("Step Info", stepInfoPanel)
             selectedIndex = 0
         }
 
@@ -151,6 +206,26 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
 
     private fun onClickExit() {
         // todo
+    }
+    private fun onStepUpdated(step: Step) {
+        nodeLogic.onStepUpdated(step)
+    }
+
+    private fun setRule(rule: Rule) {
+        currentRule = rule
+
+        // Pass rule to editor panel
+        editorLogic.setRule(rule)
+
+        // Display rule in graph panel
+        graphPanel.displayRule(rule)
+
+        // Apply layout for better visualization
+        graphPanel.applyLayout()
+
+        // Reset panels
+        editorLogic.reset()
+        stepInfoPanel.reset()
     }
 
     private fun updateRule(newRule: Rule) {

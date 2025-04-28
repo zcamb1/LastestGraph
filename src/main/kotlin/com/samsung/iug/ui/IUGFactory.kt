@@ -10,7 +10,7 @@ import com.samsung.iug.utils.AdbManager
 class IUGFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         AdbManager.initializeAdb()
-        val iugPanel = IUGRuleMaker("", "")
+        val iugPanel = IUGRuleMaker("", "",project)
         val content = ContentFactory.getInstance().createContent(iugPanel, "", false)
         toolWindow.contentManager.addContent(content)
     }
