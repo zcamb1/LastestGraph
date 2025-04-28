@@ -27,6 +27,10 @@ dependencies {
     implementation("org.bytedeco:ffmpeg:5.1.2-1.5.8")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.tinyjee.jgraphx:jgraphx:3.4.1.3")
+//    can not run on SRV
+//    implementation("org.openjfx:javafx-controls:17")
+//    implementation("org.openjfx:javafx-web:17")
+//    implementation("org.openjfx:javafx-swing:17")
 }
 
 tasks.processResources {
