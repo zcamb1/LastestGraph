@@ -44,9 +44,9 @@ object GetDevice {
         comboBox.preferredSize = Dimension(200, 30)
         panel.add(comboBox)
 
-        AdbUtils.addDeviceListener { devices ->
+        AdbUtils.addDeviceListener { device ->
             SwingUtilities.invokeLater {
-                refreshDeviceList(devices)
+                refreshDeviceList(device)
             }
         }
 

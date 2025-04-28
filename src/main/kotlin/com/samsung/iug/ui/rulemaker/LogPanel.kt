@@ -32,7 +32,7 @@ class LogPanel : JPanel(BorderLayout()) {
         background = JBColor.GRAY
 
         add(JBScrollPane(logMessagePanel), BorderLayout.CENTER)
-        preferredSize = Dimension(300, 250)
+        preferredSize = Dimension(300, 100)
     }
 
 }

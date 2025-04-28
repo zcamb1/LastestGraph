@@ -15,7 +15,7 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    localPath.set("E:/Program/Android/Android Studio 2023")
+    localPath.set("D:/Install/Android/Android Studio 2023")
     plugins.set(listOf("android"))
 }
 
@@ -59,8 +59,7 @@ tasks {
     }
 
     runIde {
-
-        ideDir.set(file("E:/Program/Android/Android Studio 2023"))
+        ideDir.set(file("D:/Install/Android/Android Studio 2023"))
     }
 
     instrumentCode {

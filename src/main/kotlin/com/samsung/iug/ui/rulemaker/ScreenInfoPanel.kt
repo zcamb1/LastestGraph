@@ -41,16 +41,16 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
             TitledBorder.LEFT,
             TitledBorder.TOP,
             null,
-            JBColor.WHITE
+//            JBColor.WHITE
         )
         val layout = screenInfoBox.layout as GroupLayout
         layout.autoCreateGaps = true
         layout.autoCreateContainerGaps = true
 
         val screenIdLabel = JLabel("Screen id:")
-        screenIdLabel.foreground = JBColor.WHITE
+//        screenIdLabel.foreground = JBColor.WHITE
         val packageNameLabel = JLabel("Package name:")
-        packageNameLabel.foreground = JBColor.WHITE
+//        packageNameLabel.foreground = JBColor.WHITE
         screenIdField.preferredSize = Dimension(160, 32)
         packageNameField.preferredSize = Dimension(160, 32)
         AdbManager.getTopResumedActivity(GetDevice.device, screenIdField, packageNameField)

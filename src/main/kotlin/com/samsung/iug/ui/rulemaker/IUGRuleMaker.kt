@@ -23,19 +23,16 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         // Common Info, Step Info, Mirror, Screen Info
         val combinedTabPanel = createCombinedTabPanel()
         val mirrorPanel = MirrorPanel()
-        val screenInfoPanel = ScreenInfoPanel {
-            commonInfoContent.updatePackageName(it)
-        }
 
-        combinedTabPanel.preferredSize = Dimension(650, 300)
-        mirrorPanel.preferredSize = Dimension(650, 400)
+
+        combinedTabPanel.preferredSize = Dimension(300, 650)
+        mirrorPanel.preferredSize = Dimension(400, 650)
 
         val centerLayout = JPanel()
         centerLayout.layout = BoxLayout(centerLayout, BoxLayout.X_AXIS) // horizontal
         centerLayout.background = JBColor.GRAY
         centerLayout.add(combinedTabPanel)
         centerLayout.add(mirrorPanel)
-        centerLayout.add(screenInfoPanel)
 
         // Graph and Log
         val graphPanelContainer = GraphPanel()
@@ -54,7 +51,6 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         add(topLayout, BorderLayout.NORTH)
         add(centerLayout, BorderLayout.CENTER)
         add(bottomLayout, BorderLayout.SOUTH)
-        preferredSize = Dimension(1200, 700)
     }
 
     private fun createTopToolBar(): JPanel {
