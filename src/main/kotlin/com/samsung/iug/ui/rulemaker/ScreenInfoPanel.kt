@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextField
+import com.samsung.iug.service.Log
 import com.samsung.iug.ui.screenmirror.GetDevice
 import com.samsung.iug.utils.AdbManager
 import com.samsung.iug.utils.DeviceManager
@@ -189,6 +190,7 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
 
     private fun captureScreen() {
         if (!DeviceManager.isAdbDeviceConnected()) {
+            Log.e("Capture screen", "No device connected.")
             Messages.showErrorDialog("No device connected.\nPlease connect a device via ADB.", "ADB Error")
             return
         }
