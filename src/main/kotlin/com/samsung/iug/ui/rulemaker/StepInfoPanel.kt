@@ -36,7 +36,8 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
 
     // Table model for layout matchers
     class LayoutMatchersTableModel : AbstractTableModel() {
-        val columns = arrayOf("matchTarget", "matchOperand", "matchCriteria", "highlightType", "transitionCondition")
+        val columns =
+            arrayOf("Match Target", "Match Operand", "Match Criteria", "Highlight Type", "Transition Condition")
         val data = mutableListOf<Array<String?>>()
 
         override fun getRowCount() = data.size
@@ -48,10 +49,12 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
             data[row][col] = value as? String
             fireTableCellUpdated(row, col)
         }
+
         fun addEmptyRow() {
             data.add(arrayOfNulls<String>(columns.size))
-            fireTableRowsInserted(data.size-1, data.size-1)
+            fireTableRowsInserted(data.size - 1, data.size - 1)
         }
+
         fun removeRow(row: Int) {
             data.removeAt(row)
             fireTableRowsDeleted(row, row)
@@ -59,8 +62,6 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
     }
 
     init {
-        background = Color(60, 63, 65)
-
         // Create main panel with form and table
         val mainPanel = createMainPanel()
         add(mainPanel, BorderLayout.CENTER)
@@ -242,13 +243,15 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
     fun updateLayoutMatchersTable(step: Step) {
         layoutMatchersModel.data.clear()
         (step.layoutMatchers ?: emptyList()).forEach { matcher ->
-            layoutMatchersModel.data.add(arrayOf(
-                matcher.matchTarget,
-                matcher.matchOperand,
-                matcher.matchCriteria,
-                matcher.highlightType,
-                matcher.transitionCondition
-            ))
+            layoutMatchersModel.data.add(
+                arrayOf(
+                    matcher.matchTarget,
+                    matcher.matchOperand,
+                    matcher.matchCriteria,
+                    matcher.highlightType,
+                    matcher.transitionCondition
+                )
+            )
         }
         layoutMatchersModel.fireTableDataChanged()
     }
@@ -260,7 +263,12 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
         val previousSteps = editorLogic.findPreviousSteps()
 
         if (previousSteps.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No previous step found.", "Navigation", JOptionPane.INFORMATION_MESSAGE)
+            JOptionPane.showMessageDialog(
+                this,
+                "No previous step found.",
+                "Navigation",
+                JOptionPane.INFORMATION_MESSAGE
+            )
             return
         }
 
@@ -348,13 +356,15 @@ class StepInfoPanel(private val editorLogic: EditorPanelLogic) : JPanel(BorderLa
             val highlightType = layoutMatchersModel.getValueAt(row, 3)?.toString()
             val transitionCondition = layoutMatchersModel.getValueAt(row, 4)?.toString()
 
-            layoutMatchers.add(LayoutMatcher(
-                matchTarget,
-                matchOperand,
-                matchCriteria,
-                highlightType,
-                transitionCondition
-            ))
+            layoutMatchers.add(
+                LayoutMatcher(
+                    matchTarget,
+                    matchOperand,
+                    matchCriteria,
+                    highlightType,
+                    transitionCondition
+                )
+            )
         }
 
         // Update step in the logic class

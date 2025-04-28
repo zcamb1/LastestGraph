@@ -1,5 +1,9 @@
 package com.samsung.iug.ui.rulemaker
 
+import com.intellij.ui.util.maximumWidth
+import com.intellij.ui.util.minimumWidth
+import com.intellij.ui.util.preferredHeight
+import com.intellij.ui.util.preferredWidth
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.JBUI
 import com.samsung.iug.logic.EditorPanelLogic
@@ -8,17 +12,16 @@ import com.samsung.iug.model.Rule
 import com.samsung.iug.model.Step
 import com.samsung.iug.service.Log
 import com.samsung.iug.ui.screenmirror.MirrorPanel
-import com.samsung.iug.utils.JsonHelper
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
 import com.samsung.iug.utils.RuleParser
 import com.samsung.iug.logic.TopToolbarLogic
-class IUGRuleMaker(private val path: String, private val username: String,private val project: Project) : JPanel(BorderLayout()) {
 
-    private lateinit var rule: Rule
+class IUGRuleMaker(private val path: String, private val username: String, private val project: Project) :
+    JPanel(BorderLayout()) {
+
     private var commonInfoContent = CommonInfoPanel()
-    private lateinit var currentStep: Step
     private var currentRule: Rule? = null
     private val ruleParser = RuleParser()
     private val editorLogic: EditorPanelLogic = EditorPanelLogic(::onStepUpdated)
@@ -26,9 +29,9 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
     private val topToolbarLogic = TopToolbarLogic(
         project,
         ruleParser,
-        ::setRule,
-        { currentRule }
-    )
+        ::setRule
+    ) { currentRule }
+
     private val nodeLogic: NodeInteractionLogic = NodeInteractionLogic(
         getCurrentRule = { currentRule },
         setRule = { rule -> currentRule = rule },
@@ -41,7 +44,7 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
         showMessage = { msg, title, type -> JOptionPane.showMessageDialog(this, msg, title, type) }
     )
 
-    private val graphPanel: GraphPanelMain = GraphPanelMain(
+    private val graphPanel: GraphPanel = GraphPanel(
         onStepSelected = { step -> nodeLogic.onStepSelected(step) },
         onAddStep = { parentStep, parentCell, parentGeo ->
             nodeLogic.onAddStep(parentStep, parentCell, parentGeo)
@@ -51,36 +54,50 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
     ) { stepA, swapId -> nodeLogic.onSwapNode(stepA, swapId) }
 
     init {
-        val maxWidth = 1200
-        val maxHeight = 800
-
         // Top bar
         val topLayout = createTopToolBar().apply {
-            preferredSize = Dimension(maxWidth, 50)
+            preferredHeight = 50
         }
 
         // Center layout: Common Info, Step Info, Mirror, Screen Info
         val combinedTabPanel = createCombinedTabPanel().apply {
-            preferredSize = Dimension(300, 650)
+            preferredHeight = 650
+            preferredWidth = 200
+            maximumWidth = 200
         }
         val mirrorPanel = MirrorPanel().apply {
-            preferredSize = Dimension(500, 650)
+            preferredHeight = 650
+        }
+
+        val splitPaneH1 = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, combinedTabPanel, mirrorPanel).apply {
+            resizeWeight = 0.7
+            border = BorderFactory.createEmptyBorder()
+            dividerSize = 2
         }
 
         val centerLayout = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS) // horizontal
             background = Color.DARK_GRAY
-            add(combinedTabPanel)
-            add(mirrorPanel)
-            preferredSize = Dimension(maxWidth, 650)
+            add(splitPaneH1)
+            preferredHeight = 650
         }
 
         // Graph and Log
-        val graphPanelContainer = createGraphPanel().apply {
-            preferredSize = Dimension(800, 250)
+        val graphPanelContainer = graphPanel.apply {
+            preferredWidth = 800
+            minimumWidth = 800
+            border = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                "Step Graph",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                null,
+                Color.WHITE
+            )
         }
         val logPanelContainer = LogPanel().apply {
-            preferredSize = Dimension(400, 250)
+            preferredWidth = 400
+            maximumWidth = 400
         }
         Log.init(logPanelContainer)
 
@@ -89,38 +106,19 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
             background = Color.DARK_GRAY
             add(graphPanelContainer)
             add(logPanelContainer)
-            preferredSize = Dimension(maxWidth, 250)
         }
 
-        // Todo: Use a vertical split pane to divide top and bottom sections with preferred ratios
+        // Split pane
+        val mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, centerLayout, bottomLayout).apply {
+            resizeWeight = 0.3
+            border = BorderFactory.createEmptyBorder()
+            dividerSize = 2
+        }
 
         // Add main layout
         background = Color.DARK_GRAY
         add(topLayout, BorderLayout.NORTH)
-        add(centerLayout, BorderLayout.CENTER)
-        add(bottomLayout, BorderLayout.SOUTH)
-    }
-
-    private fun createGraphPanel(): JPanel {
-        val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GRAY),
-            "Step graph",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            null,
-            Color.WHITE
-        )
-        panel.background = Color(60, 63, 65)
-
-        // Make sure the graph is visible
-        graphPanel.preferredSize = Dimension(950, 220)
-        panel.add(graphPanel, BorderLayout.CENTER)
-
-        // Set preferred size for the graph panel container
-        panel.preferredSize = Dimension(900, 250)
-
-        return panel
+        add(mainSplitPane)
     }
 
     private fun createTopToolBar(): JPanel {
@@ -174,8 +172,8 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
     private fun createCombinedTabPanel(): JPanel {
         val tabbedPane = JTabbedPane().apply {
             foreground = Color.WHITE
-            addTab("Common Info", commonInfoContent)
             addTab("Step Info", stepInfoPanel)
+            addTab("Common Info", commonInfoContent)
             selectedIndex = 0
         }
 
@@ -194,19 +192,10 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
         return panel
     }
 
-    private fun onClickImportFileJson() {
-        val filePath = "$path/rule.json"
-        rule = JsonHelper.readJson(filePath)
-    }
-
-    private fun onClickExportFileJson() {
-        val filePath = "$path/rule.json"
-        JsonHelper.writeJson(filePath, rule)
-    }
-
     private fun onClickExit() {
         // todo
     }
+
     private fun onStepUpdated(step: Step) {
         nodeLogic.onStepUpdated(step)
     }
@@ -227,30 +216,4 @@ class IUGRuleMaker(private val path: String, private val username: String,privat
         editorLogic.reset()
         stepInfoPanel.reset()
     }
-
-    private fun updateRule(newRule: Rule) {
-        rule = newRule
-    }
-
-    private fun updateLayoutStepInfo() {
-        // todo
-    }
-
-    private fun updateLayoutCommonInfo() {
-        // todo
-    }
-
-    private fun updateLayoutGraph() {
-        // todo
-    }
-
-    private fun nextStep() {
-
-    }
-
-    private fun previousStep() {
-
-    }
-
-
 }

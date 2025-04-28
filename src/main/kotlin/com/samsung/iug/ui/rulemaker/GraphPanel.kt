@@ -21,7 +21,7 @@ import javax.swing.*
 /**
  * Panel for displaying and interacting with the rule steps graph.
  */
-class GraphPanelMain(
+class GraphPanel(
     private val onStepSelected: (Step) -> Unit,
     private val onAddStep: (Step?, mxCell?, mxGeometry?) -> Unit,
     private val onAddSubStep: (Step) -> Unit,
@@ -29,7 +29,7 @@ class GraphPanelMain(
     private val onSwapNode: (Step, String) -> Unit
 ) : JPanel(BorderLayout()) {
 
-    private val LOG = Logger.getInstance(GraphPanelMain::class.java)
+    private val LOG = Logger.getInstance(GraphPanel::class.java)
 
     private val graph = mxGraph()
     private val graphComponent = mxGraphComponent(graph)
@@ -416,7 +416,8 @@ class GraphPanelMain(
         val height = 45.0  // Giảm từ 60.0 xuống 45.0
 
         // Disable word wrapping to ensure single line text
-        val finalStyle = style + ";wordWrap=false;whiteSpace=nowrap;overflow=hidden;fontSize=12;"  // Giảm font size từ 14 xuống 12
+        val finalStyle =
+            style + ";wordWrap=false;whiteSpace=nowrap;overflow=hidden;fontSize=12;"  // Giảm font size từ 14 xuống 12
 
         val cell = graph.insertVertex(
             parent, step.id, label,
@@ -588,7 +589,6 @@ class GraphPanelMain(
         }
 
 
-
         // Position all main flow nodes horizontally with dynamic spacing
         var currentX = 350.0  // Vị trí X bắt đầu
 
@@ -611,6 +611,7 @@ class GraphPanelMain(
         positionSubNodes()
 
     }
+
     /**
      * Position sub-nodes in vertical columns relative to their connections
      */
@@ -762,6 +763,7 @@ class GraphPanelMain(
 
         popup.show(graphComponent.graphControl, x, y)
     }
+
     fun setCellGeometry(cell: mxCell?, geo: mxGeometry) {
         graph.model.setGeometry(cell, geo)
     }
@@ -787,7 +789,7 @@ class GraphPanelMain(
         val popup = JPopupMenu()
 
         val addStepItem = JMenuItem("Add New Step")
-        addStepItem.addActionListener { onAddStep(null,null,null) }
+        addStepItem.addActionListener { onAddStep(null, null, null) }
         popup.add(addStepItem)
 
         // Add layout menu item
@@ -1116,14 +1118,21 @@ class GraphPanelMain(
     }
 
     private fun configureSubToSubEdge(edge: mxCell, source: mxCell, target: mxCell) {
-        graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+        graph.model.setStyle(
+            edge,
+            "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+        )
     }
 
     private fun configureMainToMainEdge(edge: mxCell, source: mxCell, target: mxCell) {
         // Kết nối từ main node đến main node - đơn giản là đường thẳng ngang
-        graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+        graph.model.setStyle(
+            edge,
+            "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+        )
         LOG.info("Configured Main -> Main edge routing")
     }
+
     /**
      * Configure edge routing from main node to sub node
      */
@@ -1153,7 +1162,10 @@ class GraphPanelMain(
             // Không cần thêm control point, chỉ cần đảm bảo style là orthogonal
             edgeGeo.points = ArrayList() // Không thêm điểm điều khiển
             graph.model.setGeometry(edge, edgeGeo)
-            graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+            graph.model.setStyle(
+                edge,
+                "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+            )
             LOG.info("Configured vertical edge for ${sourceId} <-> ${targetId}")
             return
         }
@@ -1206,7 +1218,10 @@ class GraphPanelMain(
         graph.model.setGeometry(edge, edgeGeo)
 
         // Áp dụng style
-        graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+        graph.model.setStyle(
+            edge,
+            "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+        )
 
         LOG.info("Configured Main -> Sub edge routing")
     }
@@ -1237,7 +1252,10 @@ class GraphPanelMain(
         if (xDiff < 20) {
             edgeGeo.points = ArrayList()
             graph.model.setGeometry(edge, edgeGeo)
-            graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+            graph.model.setStyle(
+                edge,
+                "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+            )
             LOG.info("Configured vertical edge for $sourceId <-> $targetId")
             return
         }
@@ -1267,7 +1285,7 @@ class GraphPanelMain(
             val yTarget = if (isBelow) targetTopY else targetBottomY
             edgeGeo.points.add(mxPoint(obstacleRightX, yTarget))
             // Đi sang trái vào trung điểm main node
-            edgeGeo.points.add(mxPoint(targetMidX+ 30, yTarget))
+            edgeGeo.points.add(mxPoint(targetMidX + 30, yTarget))
             LOG.info("Routed around sub node $obstacleId for $sourceId -> $targetId")
         } else {
             // Không có node chắn, vẽ thẳng ra phải, lên/xuống đến ngang main node, rồi rẽ vào
@@ -1292,7 +1310,10 @@ class GraphPanelMain(
 
         // Áp dụng geometry mới và style
         graph.model.setGeometry(edge, edgeGeo)
-        graph.model.setStyle(edge, "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;")
+        graph.model.setStyle(
+            edge,
+            "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;"
+        )
     }
 
     /**

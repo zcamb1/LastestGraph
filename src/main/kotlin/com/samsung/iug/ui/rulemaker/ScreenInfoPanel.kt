@@ -42,8 +42,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
                 null,
                 Color.WHITE
             )
-            preferredSize = Dimension(260, 160)
-            maximumSize = Dimension(320, 180)
         }
 
         val screenInfoLayout = screenInfoBox.layout as GroupLayout
@@ -52,18 +50,14 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
 
         val screenIdLabel = JLabel("Screen id:")
         val packageNameLabel = JLabel("Package name:")
-        screenIdField.preferredSize = Dimension(160, 32)
-        packageNameField.preferredSize = Dimension(160, 32)
         AdbManager.getTopResumedActivity(GetDevice.device, screenIdField, packageNameField)
         AdbManager.startListeningActivityChanges(GetDevice.device, screenIdField, packageNameField)
 
         val applyButton = JButton("Apply").apply {
-            preferredSize = Dimension(100, 32)
             addActionListener { onApplyClick(packageNameField.text) }
         }
 
         val screenIdCopyButton = JButton(AllIcons.Actions.Copy).apply {
-            preferredSize = Dimension(50, 30)
             addActionListener {
                 val text = screenIdField.text
                 val clipboard = Toolkit.getDefaultToolkit().systemClipboard
@@ -72,7 +66,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         }
 
         val packageNameCopyButton = JButton(AllIcons.Actions.Copy).apply {
-            preferredSize = Dimension(50, 30)
             addActionListener {
                 val text = packageNameField.text
                 val clipboard = Toolkit.getDefaultToolkit().systemClipboard
@@ -151,7 +144,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         // Main layout
         val gbc = GridBagConstraints()
 
-        // Thêm box ở giữa cột
         gbc.gridx = 0
         gbc.gridy = 0
         gbc.weightx = 1.0
@@ -160,7 +152,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         gbc.fill = GridBagConstraints.NONE
         add(screenInfoBox, gbc)
 
-        // Thêm controlPanel căn giữa và lên cao một chút
         val gbc2 = GridBagConstraints()
         gbc2.gridx = 0
         gbc2.gridy = 1
@@ -170,7 +161,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         gbc2.fill = GridBagConstraints.NONE
         add(controlPanel, gbc2)
 
-        // Thêm khoảng cách phía dưới controlPanel
         val gbc3 = GridBagConstraints()
         gbc3.gridx = 0
         gbc3.gridy = 2
@@ -179,8 +169,6 @@ class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) 
         gbc3.anchor = GridBagConstraints.SOUTH
         gbc3.fill = GridBagConstraints.NONE
         add(Box.createVerticalStrut(30), gbc3)
-
-        preferredSize = Dimension(290, 300)
     }
 
     override fun removeNotify() {

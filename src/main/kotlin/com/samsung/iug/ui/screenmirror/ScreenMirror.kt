@@ -35,8 +35,8 @@ object ScreenMirror {
 
     fun mapToDevice(panelX: Int, panelY: Int, device: String): Pair<Int, Int> {
         val (x, y) = getDeviceScreenSizeDdmlib(device)
-        val scaleX = x/ imageLabel.width.toDouble()
-        val scaleY = y/ imageLabel.height.toDouble()
+        val scaleX = x / imageLabel.width.toDouble()
+        val scaleY = y / imageLabel.height.toDouble()
 
         val rx = (panelX * scaleX).toInt()
         val ry = (panelY * scaleY).toInt()
@@ -56,7 +56,7 @@ object ScreenMirror {
             imageLabel.text = "Not connect"
         }
         isStream = false
-        ProcessBuilder(adbPath, "-s" , device, "forward", "--remove", "tcp:27183").start().waitFor()
+        ProcessBuilder(adbPath, "-s", device, "forward", "--remove", "tcp:27183").start().waitFor()
         ProcessBuilder(adbPath, "-s", device, "shell", "pkill", "-f", "scrcpy").start().waitFor()
     }
 
@@ -97,7 +97,7 @@ object ScreenMirror {
             val localPath = getScrcpy().absolutePath
             val serverPath = "/data/local/tmp/scrcpy-server-v3.2.jar"
 
-            ProcessBuilder(adbPath, "-s" , device, "forward", "--remove", "tcp:27183").start().waitFor()
+            ProcessBuilder(adbPath, "-s", device, "forward", "--remove", "tcp:27183").start().waitFor()
             ProcessBuilder(adbPath, "-s", device, "shell", "pkill", "-f", "scrcpy").start().waitFor()
             ProcessBuilder(adbPath, "-s", device, "push", localPath, serverPath).start().waitFor()
             ProcessBuilder(adbPath, "-s", device, "forward", "tcp:27183", "localabstract:scrcpy").start().waitFor()
@@ -122,7 +122,7 @@ object ScreenMirror {
             ProcessBuilder(command).redirectErrorStream(true).start()
 
             Thread.sleep(2000)
-            val  grabber = FFmpegFrameGrabber("tcp://127.0.0.1:27183").apply {
+            val grabber = FFmpegFrameGrabber("tcp://127.0.0.1:27183").apply {
                 format = "h264"
                 start()
             }

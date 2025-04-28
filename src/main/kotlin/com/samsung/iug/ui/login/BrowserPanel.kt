@@ -36,7 +36,6 @@ class BrowserPanel : JPanel(BorderLayout()){
 
         // Tạo nút login
         val button = JButton("Login with Samsung Account")
-        button.maximumSize = Dimension(300, 50)
         button.preferredSize = Dimension(300, 50)
         button.alignmentX = Component.CENTER_ALIGNMENT
         button.font = Font("Arial", Font.BOLD, 16)

@@ -5,12 +5,6 @@ import com.google.gson.GsonBuilder
 object JsonHelper {
     val gson = GsonBuilder().setPrettyPrinting().create()
 
-
-    inline fun <reified T> readJson(filePath: String): T {
-        val json = File(filePath).readText(Charsets.UTF_8)
-        return gson.fromJson(json, T::class.java)
-    }
-
     inline fun <reified T> fromJson(json: String): T {
         return gson.fromJson(json, T::class.java)
     }
