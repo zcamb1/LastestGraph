@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
 import com.samsung.iug.model.Rule
 import com.samsung.iug.model.Step
+import com.samsung.iug.service.Log
 import com.samsung.iug.ui.screenmirror.MirrorPanel
 import com.samsung.iug.utils.JsonHelper
 import java.awt.*
@@ -37,6 +38,7 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         // Graph and Log
         val graphPanelContainer = GraphPanel()
         val logPanelContainer = LogPanel()
+        Log.init(logPanelContainer)
 
         val bottomLayout = JPanel()
         bottomLayout.layout = BoxLayout(bottomLayout, BoxLayout.X_AXIS) // horizontal
