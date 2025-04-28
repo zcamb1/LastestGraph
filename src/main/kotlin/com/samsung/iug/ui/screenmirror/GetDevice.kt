@@ -15,7 +15,7 @@ import java.awt.Color
 object GetDevice {
     val panel: JPanel
     private val comboBox = JComboBox<String>()
-    private var device = ""
+    var device = ""
 
     init {
         panel = JPanel(FlowLayout(FlowLayout.LEFT))

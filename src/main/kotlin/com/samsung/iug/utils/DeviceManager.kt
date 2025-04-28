@@ -1,9 +1,6 @@
-package com.example.testplugin
-
-import java.io.File
+package com.samsung.iug.utils
 
 object DeviceManager {
-
     fun isAdbDeviceConnected(): Boolean {
         return try {
             val process = ProcessBuilder("adb", "devices").start()
@@ -16,5 +13,4 @@ object DeviceManager {
             false
         }
     }
-
 }

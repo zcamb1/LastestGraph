@@ -23,7 +23,9 @@ class IUGRuleMaker(private val path: String, private val username: String) : JPa
         // Common Info, Step Info, Mirror, Screen Info
         val combinedTabPanel = createCombinedTabPanel()
         val mirrorPanel = MirrorPanel()
-        val screenInfoPanel = ScreenInfoPanel()
+        val screenInfoPanel = ScreenInfoPanel {
+            commonInfoContent.updatePackageName(it)
+        }
 
         combinedTabPanel.preferredSize = Dimension(650, 300)
         mirrorPanel.preferredSize = Dimension(650, 400)

@@ -1,6 +1,6 @@
 package com.samsung.iug.ui.rulemaker
 
-import com.example.testplugin.DeviceManager
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.ui.Messages
@@ -8,12 +8,16 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextField
+import com.samsung.iug.ui.screenmirror.GetDevice
+import com.samsung.iug.utils.AdbManager
+import com.samsung.iug.utils.DeviceManager
 import java.awt.*
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.*
 import javax.swing.border.TitledBorder
 
-class ScreenInfoPanel : JPanel(GridBagLayout()) {
+class ScreenInfoPanel(onApplyClick: (String) -> Unit) : JPanel(GridBagLayout()) {
     private val screenIdField = JBTextField().apply {
         isEditable = true
     }
@@ -43,14 +47,37 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
         layout.autoCreateGaps = true
         layout.autoCreateContainerGaps = true
 
-        val screenIdLabel = JLabel("screen id:")
+        val screenIdLabel = JLabel("Screen id:")
         screenIdLabel.foreground = JBColor.WHITE
-        val packageNameLabel = JLabel("package name:")
+        val packageNameLabel = JLabel("Package name:")
         packageNameLabel.foreground = JBColor.WHITE
         screenIdField.preferredSize = Dimension(160, 32)
         packageNameField.preferredSize = Dimension(160, 32)
-        val applyButton = JButton("Apply")
-        applyButton.preferredSize = Dimension(100, 32)
+        AdbManager.getTopResumedActivity(GetDevice.device, screenIdField, packageNameField)
+        AdbManager.startListeningActivityChanges(GetDevice.device, screenIdField, packageNameField)
+
+        val applyButton = JButton("Apply").apply {
+            preferredSize = Dimension(100, 32)
+            addActionListener { onApplyClick(packageNameField.text) }
+        }
+
+        val screenIdCopyButton = JButton(AllIcons.Actions.Copy).apply {
+            preferredSize = Dimension(50, 30)
+            addActionListener {
+                val text = screenIdField.text
+                val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                clipboard.setContents(StringSelection(text), null)
+            }
+        }
+
+        val packageNameCopyButton = JButton(AllIcons.Actions.Copy).apply {
+            preferredSize = Dimension(50, 30)
+            addActionListener {
+                val text = packageNameField.text
+                val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                clipboard.setContents(StringSelection(text), null)
+            }
+        }
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -63,8 +90,16 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
                         )
                         .addGroup(
                             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(screenIdField)
-                                .addComponent(packageNameField)
+                                .addGroup(
+                                    layout.createSequentialGroup()
+                                        .addComponent(screenIdField)
+                                        .addComponent(screenIdCopyButton)
+                                )
+                                .addGroup(
+                                    layout.createSequentialGroup()
+                                        .addComponent(packageNameField)
+                                        .addComponent(packageNameCopyButton)
+                                )
                         )
                 )
                 .addComponent(
@@ -80,11 +115,13 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
                     layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(screenIdLabel)
                         .addComponent(screenIdField)
+                        .addComponent(screenIdCopyButton)
                 )
                 .addGroup(
                     layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(packageNameLabel)
                         .addComponent(packageNameField)
+                        .addComponent(packageNameCopyButton)
                 )
                 .addGap(12)
                 .addComponent(
@@ -144,6 +181,10 @@ class ScreenInfoPanel : JPanel(GridBagLayout()) {
         add(Box.createVerticalStrut(30), gbc3)
 
         preferredSize = Dimension(290, 300)
+    }
+    override fun removeNotify() {
+        super.removeNotify()
+        AdbManager.stopListeningActivityChanges()
     }
 
     private fun captureScreen() {
