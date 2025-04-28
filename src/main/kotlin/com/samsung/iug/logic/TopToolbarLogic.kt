@@ -6,7 +6,7 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.samsung.iug.model.Rule
-import com.samsung.iug.utils.RuleParser
+import com.samsung.iug.utils.JsonHelper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -22,7 +22,6 @@ import javax.swing.*
  */
 class TopToolbarLogic(
         private val project: Project,
-        private val ruleParser: RuleParser,
         private val onRuleLoaded: (Rule) -> Unit,
         private val getCurrentRule: () -> Rule?
 ) {
@@ -139,7 +138,7 @@ class TopToolbarLogic(
 
             val file = File(exportDir, filename)
 
-            val result = ruleParser.exportRuleToJsonFile(rule, file)
+            val result = JsonHelper.exportRuleToJsonFile(rule, file)
 
             if (result.first) {
                 Messages.showInfoMessage(project, "Successfully exported rule to ${file.absolutePath}", "Export Successful")
@@ -174,7 +173,8 @@ class TopToolbarLogic(
         if (files.isNotEmpty()) {
             val file = File(files[0].path)
             try {
-                val rules = ruleParser.parseRulesFromFile(file)
+                val json = file.readText()
+                val rules = JsonHelper.fromJson<List<Rule>>(json)
                 if (rules.isNotEmpty()) {
                     onRuleLoaded(rules[0])
                     Messages.showInfoMessage(project, "Successfully loaded rule: ${rules[0].id}", "Rule Loaded")
@@ -191,7 +191,6 @@ class TopToolbarLogic(
      * Handle exit button click
      */
     fun exitApplication() {
-        // Ask for confirmation
         val result = Messages.showYesNoDialog(
                 project,
                 "Are you sure you want to exit the application?",

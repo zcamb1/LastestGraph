@@ -2,6 +2,8 @@ package com.samsung.iug.utils
 
 import java.io.File
 import com.google.gson.GsonBuilder
+import com.samsung.iug.model.Rule
+
 object JsonHelper {
     val gson = GsonBuilder().setPrettyPrinting().create()
 
@@ -9,12 +11,17 @@ object JsonHelper {
         return gson.fromJson(json, T::class.java)
     }
 
-    fun toJson(obj: Any): String {
-        return gson.toJson(obj)
-    }
-
-    fun writeJson(filePath: String, obj: Any) {
+    fun writeJsonToFile(filePath: String, obj: Any) {
         val json = gson.toJson(obj)
         File(filePath).writeText(json, Charsets.UTF_8)
+    }
+
+    fun exportRuleToJsonFile(rule: Rule, file: File): Pair<Boolean, String?> {
+        return try {
+            writeJsonToFile(file.absolutePath, rule)
+            Pair(true, null)
+        } catch (e: Exception) {
+            Pair(false, "Error exporting rule: ${e.message}")
+        }
     }
 }

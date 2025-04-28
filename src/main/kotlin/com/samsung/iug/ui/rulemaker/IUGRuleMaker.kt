@@ -15,7 +15,6 @@ import com.samsung.iug.ui.screenmirror.MirrorPanel
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
-import com.samsung.iug.utils.RuleParser
 import com.samsung.iug.logic.TopToolbarLogic
 
 class IUGRuleMaker(private val path: String, private val username: String, private val project: Project) :
@@ -23,12 +22,10 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
 
     private var commonInfoContent = CommonInfoPanel()
     private var currentRule: Rule? = null
-    private val ruleParser = RuleParser()
     private val editorLogic: EditorPanelLogic = EditorPanelLogic(::onStepUpdated)
     private val stepInfoPanel: StepInfoPanel = StepInfoPanel(editorLogic)
     private val topToolbarLogic = TopToolbarLogic(
         project,
-        ruleParser,
         ::setRule
     ) { currentRule }
 

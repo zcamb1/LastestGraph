@@ -2,8 +2,6 @@ package com.samsung.iug.logic
 
 import com.samsung.iug.model.*
 
-import javax.swing.JOptionPane
-
 /**
  * Class containing logic for step editing, separated from UI components.
  */
