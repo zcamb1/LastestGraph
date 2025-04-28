@@ -47,7 +47,7 @@ class MirrorPanel : JPanel(BorderLayout()) {
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, screenMirror, infoPanel).apply {
             resizeWeight = 0.5
             border = BorderFactory.createEmptyBorder()
-            dividerSize = 2
+            dividerSize = 5
         }
 
         add(splitPane)

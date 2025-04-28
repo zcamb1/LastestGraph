@@ -2,7 +2,9 @@ package com.samsung.iug.ui.screenmirror
 
 import com.android.ddmlib.IDevice
 import com.intellij.icons.AllIcons.*
+import com.intellij.openapi.diagnostic.thisLogger
 import com.samsung.iug.adb.AdbUtils
+import com.samsung.iug.service.Log
 import java.awt.Dimension
 import java.awt.FlowLayout
 import javax.swing.BorderFactory
@@ -21,7 +23,8 @@ object GetDevice {
         panel = JPanel(FlowLayout(FlowLayout.LEFT))
         panel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK)
         AdbUtils.initAdb()
-
+        Log.i("AdbManager", "Connected adb")
+        thisLogger().warn("adb yuguygyug")
         val devices = AdbUtils.getConnectedDevices()
         if (devices.isEmpty()) {
             comboBox.addItem("None")

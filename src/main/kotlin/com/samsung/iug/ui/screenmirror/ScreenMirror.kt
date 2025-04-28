@@ -17,8 +17,7 @@ object ScreenMirror {
     private var isStream = false
 
     init {
-        panel.add(imageLabel, BorderLayout.WEST)
-        imageLabel.setBounds(0, 0, 400, 600)
+        panel.add(imageLabel, BorderLayout.CENTER)
     }
 
     fun getDeviceScreenSizeDdmlib(device: String): Pair<Int, Int> {
@@ -34,12 +33,30 @@ object ScreenMirror {
     }
 
     fun mapToDevice(panelX: Int, panelY: Int, device: String): Pair<Int, Int> {
-        val (x, y) = getDeviceScreenSizeDdmlib(device)
-        val scaleX = x / imageLabel.width.toDouble()
-        val scaleY = y / imageLabel.height.toDouble()
+        val (deviceWidth, deviceHeight) = getDeviceScreenSizeDdmlib(device)
+        val imageIcon = imageLabel.icon as? ImageIcon ?: return Pair(0, 0)
 
-        val rx = (panelX * scaleX).toInt()
-        val ry = (panelY * scaleY).toInt()
+        val imageWidth = imageIcon.iconWidth
+        val imageHeight = imageIcon.iconHeight
+
+        val labelWidth = imageLabel.width
+        val labelHeight = imageLabel.height
+
+        val offsetX = (labelWidth - imageWidth)/2
+        val offsetY = (labelHeight - imageHeight)/2
+
+        val relativeX = panelX - offsetX
+        val relativeY = panelY - offsetY
+
+        if (relativeX < 0 || relativeY < 0 || relativeX > imageWidth || relativeY > imageHeight) {
+            return Pair(0, 0)
+        }
+
+        val scaleX = deviceWidth / imageWidth.toDouble()
+        val scaleY = deviceHeight / imageHeight.toDouble()
+
+        val rx = (relativeX * scaleX).toInt()
+        val ry = (relativeY * scaleY).toInt()
 
         return Pair(rx, ry)
     }
@@ -51,11 +68,13 @@ object ScreenMirror {
     }
 
     fun stopStream(device: String) {
+        isStream = false
         SwingUtilities.invokeLater {
             imageLabel.icon = null
             imageLabel.text = "Not connect"
+            imageLabel.revalidate()
+            imageLabel.repaint()
         }
-        isStream = false
         ProcessBuilder(adbPath, "-s", device, "forward", "--remove", "tcp:27183").start().waitFor()
         ProcessBuilder(adbPath, "-s", device, "shell", "pkill", "-f", "scrcpy").start().waitFor()
     }
@@ -78,7 +97,6 @@ object ScreenMirror {
 
                 val isTap = (Math.abs(lastX - endX) < 10) && (Math.abs(lastY - endY) < 10)
                 val duration = if (isTap) 1 else 300
-                println("Ok")
                 Runtime.getRuntime().exec("$adbPath -s $device shell input swipe $lastX $lastY $endX $endY $duration")
             }
         }
@@ -128,26 +146,38 @@ object ScreenMirror {
             }
 
             val converter = Java2DFrameConverter()
-            imageLabel.text = ""
+            imageLabel.text = null
+            try {
+                while (isStream) {
+                    try {
+                        val frame = grabber.grabImage()
+                        if (frame != null) {
+                            val bufferedImage = converter.convert(frame)
 
-            while (isStream) {
-                try {
-                    val frame = grabber.grabImage()
-                    if (frame != null) {
-                        val bufferedImage = converter.convert(frame)
-
-                        SwingUtilities.invokeLater {
-                            imageLabel.icon = ImageIcon(bufferedImage)
-                            imageLabel.setBounds(0, 0, bufferedImage.width, bufferedImage.height)
-//                            imageLabel.setSize(bufferedImage.width, bufferedImage.height)
+                            SwingUtilities.invokeLater {
+                                if (!isStream) {
+                                    return@invokeLater
+                                }
+                                imageLabel.icon = ImageIcon(bufferedImage)
+                                imageLabel.setSize(bufferedImage.width, bufferedImage.height)
+                                imageLabel.revalidate()
+                                imageLabel.repaint()
+                            }
                         }
-                    }
 
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        break
+                    }
+                }
+            } finally {
+                try {
+                    grabber.stop()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    break
                 }
             }
+
 
         } catch (e: Exception) {
             e.printStackTrace()

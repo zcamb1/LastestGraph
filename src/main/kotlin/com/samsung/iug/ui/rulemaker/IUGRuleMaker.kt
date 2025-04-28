@@ -51,6 +51,12 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
     ) { stepA, swapId -> nodeLogic.onSwapNode(stepA, swapId) }
 
     init {
+        val logPanelContainer = LogPanel().apply {
+            preferredWidth = 400
+            maximumWidth = 400
+        }
+        Log.init(logPanelContainer)
+
         // Top bar
         val topLayout = createTopToolBar().apply {
             preferredHeight = 50
@@ -69,7 +75,7 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         val splitPaneH1 = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, combinedTabPanel, mirrorPanel).apply {
             resizeWeight = 0.7
             border = BorderFactory.createEmptyBorder()
-            dividerSize = 2
+            dividerSize = 5
         }
 
         val centerLayout = JPanel().apply {
@@ -92,11 +98,6 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
                 Color.WHITE
             )
         }
-        val logPanelContainer = LogPanel().apply {
-            preferredWidth = 400
-            maximumWidth = 400
-        }
-        Log.init(logPanelContainer)
 
         val bottomLayout = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS) // horizontal
@@ -109,7 +110,7 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         val mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, centerLayout, bottomLayout).apply {
             resizeWeight = 0.3
             border = BorderFactory.createEmptyBorder()
-            dividerSize = 2
+            dividerSize = 5
         }
 
         // Add main layout
