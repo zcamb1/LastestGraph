@@ -18,6 +18,7 @@ object ScreenMirror {
 
     init {
         panel.add(imageLabel, BorderLayout.WEST)
+        imageLabel.setBounds(0, 0, 400, 600)
     }
 
     fun getDeviceScreenSizeDdmlib(device: String): Pair<Int, Int> {
@@ -50,9 +51,13 @@ object ScreenMirror {
     }
 
     fun stopStream(device: String) {
+        SwingUtilities.invokeLater {
+            imageLabel.icon = null
+            imageLabel.text = "Not connect"
+        }
         isStream = false
-        imageLabel.icon = null
-        imageLabel.text = "Not connect"
+        ProcessBuilder(adbPath, "-s" , device, "forward", "--remove", "tcp:27183").start().waitFor()
+        ProcessBuilder(adbPath, "-s", device, "shell", "pkill", "-f", "scrcpy").start().waitFor()
     }
 
     fun startControl(device: String) {

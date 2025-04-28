@@ -1,10 +1,12 @@
 package com.samsung.iug.ui.screenmirror
 
-import com.intellij.ui.JBColor
 import com.samsung.iug.ui.rulemaker.CommonInfoPanel
+import com.samsung.iug.ui.rulemaker.LayoutInspectorPanel
 import com.samsung.iug.ui.rulemaker.ScreenInfoPanel
 import java.awt.BorderLayout
+import java.awt.Color
 import javax.swing.BorderFactory
+import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.border.TitledBorder
 
@@ -12,26 +14,24 @@ class MirrorPanel: JPanel(BorderLayout()) {
     private var commonInfoContent = CommonInfoPanel()
 
     init {
-        border = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(JBColor.GRAY),
-            "Mirror screen",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            null,
-            JBColor.WHITE
-        )
 
         val screenInfoPanel = ScreenInfoPanel {
             commonInfoContent.updatePackageName(it)
         }
 
         border = BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(JBColor.GRAY, 1),
+            BorderFactory.createLineBorder(Color.GRAY, 1),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         )
 
         add(GetDevice.panel, BorderLayout.NORTH)
         add(ScreenMirror.panel, BorderLayout.WEST)
-        add(screenInfoPanel, BorderLayout.EAST)
+
+        val infoPanel = JPanel()
+        val infoLayout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
+        infoPanel.layout = infoLayout
+        add(infoPanel, BorderLayout.EAST)
+        infoPanel.add(screenInfoPanel)
+        infoPanel.add(LayoutInspectorPanel())
     }
 }
