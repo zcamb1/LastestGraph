@@ -1,20 +1,29 @@
 package com.samsung.iug.ui.rulemaker
 
 import com.samsung.iug.model.Rule
-import com.samsung.iug.model.Step
-import com.intellij.openapi.diagnostic.Logger
+import com.samsung.iug.model.*
+import com.intellij.icons.AllIcons
 import com.intellij.ui.JBColor
+import com.intellij.util.ui.JBUI
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
+import com.mxgraph.layout.orthogonal.mxOrthogonalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.model.mxGeometry
+import com.mxgraph.util.mxPoint
 import com.mxgraph.swing.mxGraphComponent
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.mxGraph
+import com.mxgraph.view.mxStylesheet
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.FlowLayout
+import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.datatransfer.StringSelection
+import java.awt.Toolkit
+import java.util.*
 import javax.swing.*
 
 /**
@@ -28,8 +37,6 @@ class GraphPanel(
     private val onSwapNode: (Step, String) -> Unit
 ) : JPanel(BorderLayout()) {
 
-    private val LOG = Logger.getInstance(GraphPanel::class.java)
-
     private val graph = mxGraph()
     private val graphComponent = mxGraphComponent(graph)
 
@@ -37,10 +44,8 @@ class GraphPanel(
     private val cellToStepMap = mutableMapOf<Any, Step>()
     private val stepToCellMap = mutableMapOf<String, Any>()
 
-    // Biến lưu zoom level hiện tại
-    private var userZoomLevel: Double = 0.9  // Mặc định là 0.9 - scale nhỏ hơn một chút
+    private var userZoomLevel: Double = 0.9
 
-    // Constants for styling
     private val MAIN_STEP_STYLE = "mainStep"
     private val SUB_STEP_STYLE = "subStep"
     private val EDGE_STYLE = "edge"
@@ -48,42 +53,12 @@ class GraphPanel(
     private val START_STEP_STYLE = "startStep"
     private val END_STEP_STYLE = "endStep"
 
-    // Default edge color - can be overridden when rule is loaded
-    private var defaultEdgeColor = "#b1b1b1" // Default dark gray color
+    private var defaultEdgeColor = "#b1b1b1"
 
-    // Store main flow path for layout
     private var mainFlowPath = listOf<String>()
 
-    private val layoutManager = GraphLayoutManager(graph, graphComponent, stepToCellMap, cellToStepMap) { LOG.info(it) }
-
-    // Manages edge (connection) creation and routing between nodes in the graph
-    private val edgeManager = GraphEdgeManager(graph, graphComponent, stepToCellMap, cellToStepMap) { LOG.info(it) }
-
-    //Manager right-click context menu for nodes and empty space
-    private val contextMenuManager = ContextMenuManager(
-        graph,
-        graphComponent,
-        stepToCellMap,
-        cellToStepMap,
-        onStepSelected = { step -> onStepSelected(step) },
-        onAddSubStep = { step -> onAddSubStep(step) },
-        onAddStep = { step, cell, geo -> onAddStep(step, cell, geo) },
-        onRemoveStep = { step -> onRemoveStep(step) },
-        onSwapNode = { step, targetId -> onSwapNode(step, targetId) },
-        applyLayout = { applyLayout() }
-    )
-
-    // Manages getting and setting zoom levels for the graph component
-    private val zoomManager = ZoomManager(graphComponent, LOG)
-
-    // Manages viewport translation to ensure all nodes are visible
-    private val viewportManager = ViewportManager(graph, graphComponent, stepToCellMap, LOG)
-
-    // Manages creating and styling step nodes (cells) in the graph
-    private val stepCellFactory = StepCellFactory(graph, stepToCellMap, cellToStepMap) { currentRule }
 
     init {
-        // Configure graph settings
         graph.isAllowDanglingEdges = false
         graph.isAllowLoops = true
         graph.isCellsEditable = false
@@ -91,46 +66,34 @@ class GraphPanel(
         graph.isCellsMovable = true
         graph.isDisconnectOnMove = false
 
-        // Set default edge style to orthogonal
         graph.stylesheet.defaultEdgeStyle[mxConstants.STYLE_EDGE] = mxConstants.EDGESTYLE_ORTHOGONAL
         graph.stylesheet.defaultEdgeStyle[mxConstants.STYLE_ROUNDED] = true
         graph.stylesheet.defaultEdgeStyle[mxConstants.STYLE_ARCSIZE] = 15
 
-        // Configure graph component
         graphComponent.connectionHandler.isEnabled = false
         graphComponent.setToolTips(true)
 
-
-        // Set anti-aliasing for better rendering
         graphComponent.setAntiAlias(true)
         graphComponent.setTextAntiAlias(true)
         graphComponent.verticalScrollBar.unitIncrement = 7
         graphComponent.horizontalScrollBar.unitIncrement = 7
-        // Set background color
         graphComponent.setBackground(JBColor(Color(250, 250, 250), Color(60, 63, 65)))
 
-        // Increase grid size for more spacing
         graph.gridSize = 50
 
-        // Configure viewport to show negative coordinates
         graphComponent.viewport.setViewPosition(java.awt.Point(0, 200))
 
-        GraphStyles.setupStylesheet(graph, defaultEdgeColor)
+        setupStylesheet()
 
-        // Create panel for controls
         val controlPanel = JPanel(FlowLayout(FlowLayout.LEFT))
 
 
-        // Add components to panel
         add(controlPanel, BorderLayout.NORTH)
         add(graphComponent, BorderLayout.CENTER)
 
-        // Add listener to update coordinates when cells are moved
         graph.addListener("cellsMoved") { sender, evt ->
-            // updateCoordinateDisplay() call removed
         }
 
-        // Add mouse listener for selecting cells
         graphComponent.graphControl.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
@@ -140,7 +103,6 @@ class GraphPanel(
                         if (step != null) {
                             onStepSelected(step)
 
-                            // Remove coordinate display dialog when clicking on a node
                         }
                     }
                 }
@@ -152,27 +114,87 @@ class GraphPanel(
                     if (cell != null && cell is mxCell && !cell.isEdge) {
                         val step = cellToStepMap[cell]
                         if (step != null) {
-                            contextMenuManager.showContextMenu(e.x, e.y, step)
+                            showContextMenu(e.x, e.y, step)
                         }
                     } else {
                         // Show context menu for empty space
-                        contextMenuManager.showEmptySpaceContextMenu(e.x, e.y)
+                        showEmptySpaceContextMenu(e.x, e.y)
                     }
                 }
             }
         })
     }
 
+    private fun setupStylesheet() {
+        val stylesheet = graph.stylesheet
 
-    /**
-     * Display a rule in the graph panel.
-     */
+        fun nodeStyle(
+            fill: String,
+            stroke: String,
+            font: Int = 12,
+            width: Double = 1.5
+        ): java.util.HashMap<String, Any> {
+            val map = java.util.HashMap<String, Any>()
+            map[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE
+            map[mxConstants.STYLE_PERIMETER] = mxConstants.PERIMETER_RECTANGLE
+            map[mxConstants.STYLE_ROUNDED] = true
+            map[mxConstants.STYLE_ARCSIZE] = 20
+            map[mxConstants.STYLE_FONTSIZE] = font
+            map[mxConstants.STYLE_FONTCOLOR] = "#000000"
+            map[mxConstants.STYLE_FILLCOLOR] = fill
+            map[mxConstants.STYLE_STROKECOLOR] = stroke
+            map[mxConstants.STYLE_STROKEWIDTH] = width
+            map[mxConstants.STYLE_SHADOW] = true
+            map[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER
+            map[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE
+            map["wordWrap"] = "true"
+            return map
+        }
+
+        // Đăng ký các style cho node
+        stylesheet.putCellStyle(MAIN_STEP_STYLE, nodeStyle("#D4E7FF", "#7EA6E0"))
+        stylesheet.putCellStyle(SUB_STEP_STYLE, nodeStyle("#F0F0F0", "#B0B0B0", font = 11))
+        stylesheet.putCellStyle(START_STEP_STYLE, nodeStyle("#A5D6A7", "#2E7D32", width = 2.0))
+        stylesheet.putCellStyle(END_STEP_STYLE, nodeStyle("#FFD2D2", "#FF9999"))
+        stylesheet.putCellStyle(ACTIVE_STEP_STYLE, nodeStyle("#FFE2B8", "#FFA940", width = 2.0))
+
+        // Edge style
+        val edgeStyle = java.util.HashMap<String, Any>().apply {
+            put(mxConstants.STYLE_STROKECOLOR, defaultEdgeColor)
+            put(mxConstants.STYLE_STROKEWIDTH, 2.0)
+            put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_CLASSIC)
+            put(mxConstants.STYLE_FONTSIZE, 11)
+            put(mxConstants.STYLE_OPACITY, 100)
+            put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL)
+            put(mxConstants.STYLE_ROUNDED, true)
+            put(mxConstants.STYLE_ARCSIZE, 15)
+            put(mxConstants.STYLE_ENDSIZE, 12.0)
+        }
+        stylesheet.putCellStyle(EDGE_STYLE, edgeStyle)
+    }
+
+    private fun getCurrentZoom(): Double {
+        return try {
+            graphComponent.graph.view.scale
+        } catch (e: Exception) {
+            1.0 // Default zoom level
+        }
+    }
+
+    private fun setZoomLevel(zoomLevel: Double) {
+        try {
+            val adjustedZoom = 1.0
+            graphComponent.zoom(adjustedZoom)
+        } catch (e: Exception) {
+        }
+    }
+
+    private fun ensureNodesVisible() {
+        GraphPanelLayoutUtils.ensureNodesVisible(graph, stepToCellMap, graphComponent)
+    }
+
     fun displayRule(rule: Rule) {
-        // Lưu ý: Tất cả việc điều chỉnh zoom KHÔNG được thực hiện trực tiếp ở đây
-        // mà được tập trung ở phương thức applyLayout() để tránh việc reset zoom nhiều lần
-
-        // Lưu lại zoom level hiện tại trước khi load file mới
-        val currentZoom = zoomManager.getCurrentZoom()
+        val currentZoom = getCurrentZoom()
 
         currentRule = rule
         cellToStepMap.clear()
@@ -181,19 +203,17 @@ class GraphPanel(
         // Check if rule has custom edge color defined
         if (rule.edgeColor != null && rule.edgeColor.isNotEmpty()) {
             defaultEdgeColor = rule.edgeColor
-            LOG.info("Using edge color from rule: $defaultEdgeColor")
             // Re-setup stylesheet with new color
-            GraphStyles.setupStylesheet(graph, defaultEdgeColor)
+            setupStylesheet()
         }
 
-        // Create the graph in a single transaction with improved positioning
         graph.model.beginUpdate()
         try {
             graph.removeCells(graph.getChildCells(graph.defaultParent))
 
             // First create all nodes with appropriate styles
             for (step in rule.steps) {
-                stepCellFactory.createStepCell(step)
+                createStepCell(step)
             }
 
             // Create all edges
@@ -207,14 +227,13 @@ class GraphPanel(
         graph.model.beginUpdate()
         try {
             // Apply our custom layout logic
-            layoutManager.applyCustomMainFlowLayout(rule)
-
+            applyCustomMainFlowLayout(rule)
 
             // Apply special treatments for edges to avoid crossing nodes
-            edgeManager.createSpecialEdges(currentRule!!)
+            createSpecialEdges()
 
             // Translate graph and ensure all nodes are visible
-            viewportManager.ensureNodesVisible()
+            ensureNodesVisible()
 
         } finally {
             graph.model.endUpdate()
@@ -222,7 +241,6 @@ class GraphPanel(
 
         // Check if edges were created
         val edgeCount = countEdges()
-        LOG.info("After layout, graph has ${rule.steps.size} nodes and $edgeCount edges")
 
         // If no edges, try a direct approach
         if (edgeCount == 0 && hasExpectedConnections(rule)) {
@@ -235,14 +253,68 @@ class GraphPanel(
             )
         }
 
-        // Khôi phục zoom level sau khi đã load xong file
-        zoomManager.setZoomLevel(currentZoom)
+        setZoomLevel(currentZoom)
+    }
+
+    private fun calculateWidthForText(text: String): Double {
+        return GraphUtils.calculateWidthForText(text)
+    }
+
+    private fun formatStepLabel(step: Step): String {
+        return GraphUtils.formatStepLabel(step)
+    }
+
+    private fun createStepCell(step: Step): Any {
+        val parent = graph.defaultParent
+
+        val style = determineStepStyle(step)
+        val label = formatStepLabel(step)
+        val width = calculateWidthForText(label)
+        val height = 45.0
+
+        val finalStyle = style + ";wordWrap=false;whiteSpace=nowrap;overflow=hidden;fontSize=12;"
+
+        val cell = graph.insertVertex(
+            parent, step.id, label,
+            0.0, 0.0, width, height, finalStyle
+        )
+
+        cellToStepMap[cell] = step
+        stepToCellMap[step.id] = cell
+
+        return cell
+    }
+
+
+    private fun isStartStep(step: Step): Boolean {
+        // A step is considered a start step if it's not referenced by any other step
+        val rule = currentRule ?: return false
+        return GraphUtils.isStartStep(step, rule)
+    }
+
+
+    private fun determineStepStyle(step: Step): String {
+        // Check if this is the first step (entry point)
+        val isFirstStep = isStartStep(step)
+
+        // Check if this is an end step (no outgoing connections)
+        val isEndStep = isEndStep(step)
+
+        return when {
+            isFirstStep -> START_STEP_STYLE
+            isEndStep -> END_STEP_STYLE
+            step.isSubStep -> SUB_STEP_STYLE
+            else -> MAIN_STEP_STYLE
+        }
     }
 
     /**
-     * Manually create ALL edges in the rule at once with appropriate styling
-     * based on the relationship between nodes.
+     * Check if a step is an end step (terminal node).
      */
+    private fun isEndStep(step: Step): Boolean {
+        return GraphUtils.isEndStep(step)
+    }
+
     private fun createAllEdges(rule: Rule) {
         var edgesCreated = 0
 
@@ -253,153 +325,277 @@ class GraphPanel(
         }
 
         // Find all bidirectional pairs (nodes that connect to each other)
-        val bidirectionalPairs = edgeManager.findAllBidirectionalPairs(currentRule!!)
-        LOG.info("Found ${bidirectionalPairs.size} bidirectional pairs: ${bidirectionalPairs.joinToString()}")
+        val bidirectionalPairs = findAllBidirectionalPairs()
 
         // Identify start nodes for special edge styling
-        val startNodes = rule.steps.filter { step -> stepCellFactory.isStartStep(step) }.map { it.id }
-        LOG.info("Found start nodes: ${startNodes.joinToString()}")
+        val startNodes = rule.steps.filter { step -> isStartStep(step) }.map { it.id }
 
         // Create all edges based on nextStepIds
         for (step in rule.steps) {
             val sourceCell = stepToCellMap[step.id]
             if (sourceCell == null) {
-                LOG.error("Source cell not found for step ${step.id}")
                 continue
             }
 
-            // Check if source is a main step (not a sub-step)
             val isMainStep = !step.isSubStep
             val isSourceStartNode = startNodes.contains(step.id)
 
             for (nextStepId in step.nextStepIds) {
                 val targetCell = stepToCellMap[nextStepId]
                 if (targetCell == null) {
-                    LOG.error("Target cell not found for step $nextStepId")
                     continue
                 }
 
-                // Get target step info
                 val targetStep = rule.steps.find { it.id == nextStepId }
                 if (targetStep == null) {
-                    LOG.error("Target step not found for ID $nextStepId")
                     continue
                 }
 
-                // Check if target is a main step
                 val isTargetMainStep = !targetStep.isSubStep
 
-                // Use consistent EDGE_STYLE for all connections
-                // to follow the rule: "Avoid making the connectors too colorful"
                 val edgeStyle = EDGE_STYLE
 
-                // Create the edge with appropriate style
+                val edge = graph.insertEdge(
+                    graph.defaultParent,
+                    "edge_${step.id}_to_$nextStepId",
+                    "",
+                    sourceCell,
+                    targetCell,
+                    edgeStyle
+                )
                 edgesCreated++
 
-                // Log connection information - but don't change color
                 if (isSourceStartNode) {
-                    LOG.info("Created edge from START node: ${step.id} → $nextStepId")
                 } else if (isMainStep && isTargetMainStep) {
-                    LOG.info("Created main-to-main edge: ${step.id} → $nextStepId")
                 } else {
-                    LOG.info("Created edge: ${step.id} → $nextStepId")
                 }
             }
         }
-
-        LOG.info("Created $edgesCreated edges based on rule data")
     }
 
+    private fun applyCustomMainFlowLayout(rule: Rule) {
+        if (rule.steps.isEmpty()) return
 
+        mainFlowPath = identifyMainFlowPath(rule)
 
-    fun setCellGeometry(cell: mxCell?, geo: mxGeometry) {
-        graph.model.setGeometry(cell, geo)
-    }
-
-    /**
-     * Get the cell object for a given step ID
-     */
-    fun getCellForStep(stepId: String): mxCell? {
-        return stepToCellMap[stepId] as? mxCell
-    }
-
-    /**
-     * Get the geometry for a given cell
-     */
-    fun getCellGeometry(cell: mxCell?): mxGeometry? {
-        return cell?.let { graph.getCellGeometry(it) }
-    }
-
-
-    /**
-     * Refresh the graph display based on the current rule.
-     */
-    fun refreshGraph() {
-        currentRule?.let { displayRule(it) }
-
-        // Extra check to ensure all nodes are visible after refresh
-        viewportManager.ensureNodesVisible()
-    }
-
-
-    /**
-     * Count the number of edges in the graph
-     */
-    private fun countEdges(): Int {
-        val edges = graph.getChildEdges(graph.defaultParent)
-        return edges?.size ?: 0
-    }
-
-    /**
-     * Check if the rule has any expected connections
-     */
-    private fun hasExpectedConnections(rule: Rule): Boolean {
-        return rule.steps.any { it.nextStepIds.isNotEmpty() }
-    }
-
-    /**
-     * Public method to apply layout when needed.
-     */
-    fun applyLayout() {
         graph.model.beginUpdate()
         try {
-            // Get the current rule and apply the layout
-            currentRule?.let {
-                layoutManager.applyCustomMainFlowLayout(it)
-            } ?: {
-                // Apply a simple layout if no rule is available
-                val layout = mxHierarchicalLayout(graph, SwingConstants.WEST)
-                layout.execute(graph.defaultParent)
-            }()
+            positionMainFlow(mainFlowPath)
 
-            // Center the graph in the view
-            graphComponent.zoomAndCenter()
-
-            // Khôi phục zoom level hiện tại của người dùng thay vì reset
-            zoomManager.setZoomLevel(userZoomLevel)
+            ensureVerticalEdgesAligned()
 
         } finally {
             graph.model.endUpdate()
         }
     }
 
+    private fun positionMainFlow(mainFlowPath: List<String>) {
+        GraphPanelLayoutUtils.positionMainFlow(graph, stepToCellMap, mainFlowPath, currentRule)
+    }
 
-    /**
-     * Reconstruct the path from start to end using the parent map.
-     */
-    private fun reconstructPath(parentMap: Map<String, String>, startNodeId: String, endNodeId: String): List<String> {
-        val path = mutableListOf<String>()
-        var currentId = endNodeId
+    private fun positionSubNodes() {
+        GraphPanelLayoutUtils.positionSubNodes(graph, stepToCellMap, currentRule)
+    }
 
-        // Work backwards from end to start
-        while (currentId != startNodeId) {
-            path.add(0, currentId)
-            currentId = parentMap[currentId] ?: break
+
+    fun getMainSteps(): List<Step> {
+        val rule = currentRule ?: return emptyList()
+        return rule.steps.filter { !it.isSubStep }
+    }
+
+
+    fun getSubSteps(): List<Step> {
+        val rule = currentRule ?: return emptyList()
+        return rule.steps.filter { it.isSubStep }
+    }
+
+    private fun showContextMenu(x: Int, y: Int, step: Step) {
+        val popup = JPopupMenu()
+
+        val editItem = JMenuItem("Edit Step")
+        editItem.addActionListener { onStepSelected(step) }
+        popup.add(editItem)
+
+        if (!step.isSubStep) {
+            val addSubStepItem = JMenuItem("Add Sub-Step")
+            addSubStepItem.addActionListener { onAddSubStep(step) }
+            popup.add(addSubStepItem)
+
+            val addNextStepItem = JMenuItem("Add Next Step")
+            addNextStepItem.addActionListener {
+                val parentCell = stepToCellMap[step.id] as? com.mxgraph.model.mxCell
+                val parentGeo = parentCell?.let { graph.getCellGeometry(it) }
+                onAddStep(step, parentCell, parentGeo)
+            }
+            popup.add(addNextStepItem)
         }
 
-        // Add the start node
-        path.add(0, startNodeId)
+        val removeItem = JMenuItem("Remove Step")
+        removeItem.isEnabled = !step.hasChildren()
+        removeItem.addActionListener {
+            if (onRemoveStep(step)) {
+                refreshGraph()
+            }
+        }
+        popup.add(removeItem)
 
-        return path
+        val swapItem = JMenuItem("Swap Node")
+        swapItem.addActionListener {
+            val swapId = JOptionPane.showInputDialog(
+                null,
+                "Enter ID of node to swap with:",
+                "Swap Node",
+                JOptionPane.QUESTION_MESSAGE
+            )
+            if (swapId != null && swapId.isNotBlank()) {
+                onSwapNode(step, swapId.trim())
+            }
+        }
+        popup.add(swapItem)
+
+        popup.addSeparator()
+        val layoutItem = JMenuItem("Rearrange Layout")
+        layoutItem.addActionListener {
+            applyLayout()
+        }
+        popup.add(layoutItem)
+
+        popup.show(graphComponent.graphControl, x, y)
     }
+    fun setCellGeometry(cell: mxCell?, geo: mxGeometry) {
+        graph.model.setGeometry(cell, geo)
+    }
+
+    fun getCellForStep(stepId: String): mxCell? {
+        return stepToCellMap[stepId] as? mxCell
+    }
+
+
+    fun getCellGeometry(cell: mxCell?): mxGeometry? {
+        return cell?.let { graph.getCellGeometry(it) }
+    }
+
+
+    private fun showEmptySpaceContextMenu(x: Int, y: Int) {
+        val popup = JPopupMenu()
+
+        val addStepItem = JMenuItem("Add New Step")
+        addStepItem.addActionListener { onAddStep(null,null,null) }
+        popup.add(addStepItem)
+
+        // Add layout menu item
+        popup.addSeparator()
+        val layoutItem = JMenuItem("Rearrange Layout")
+        layoutItem.addActionListener {
+            applyLayout()
+        }
+        popup.add(layoutItem)
+
+        popup.show(graphComponent.graphControl, x, y)
+    }
+
+
+
+    fun refreshGraph() {
+        currentRule?.let { displayRule(it) }
+
+        ensureNodesVisible()
+    }
+
+    private fun identifyMainFlowPath(rule: Rule): List<String> {
+        return GraphUtils.identifyMainFlowPath(rule)
+    }
+
+    private fun countEdges(): Int {
+        val edges = graph.getChildEdges(graph.defaultParent)
+        return edges?.size ?: 0
+    }
+
+    private fun hasExpectedConnections(rule: Rule): Boolean {
+        return GraphUtils.hasExpectedConnections(rule)
+    }
+
+
+    private fun ensureVerticalEdgesAligned() {
+        // Process allconnections
+        currentRule?.let { rule ->
+            for (step in rule.steps) {
+                val sourceCell = stepToCellMap[step.id] ?: continue
+                val sourceGeo = graph.getCellGeometry(sourceCell) ?: continue
+                val sourceCenterX = sourceGeo.x + sourceGeo.width / 2
+
+                for (nextStepId in step.nextStepIds) {
+                    val targetCell = stepToCellMap[nextStepId] ?: continue
+                    val targetGeo = graph.getCellGeometry(targetCell) ?: continue
+
+                    val yDiff = Math.abs(sourceGeo.y - targetGeo.y)
+                    val xDiff = Math.abs(sourceGeo.x - targetGeo.x)
+
+                    if (yDiff > 70 && xDiff < 100) {
+                        val targetCenterX = targetGeo.x + targetGeo.width / 2
+                        val newTargetX = sourceCenterX - targetGeo.width / 2
+
+                        if (Math.abs(sourceCenterX - targetCenterX) > 2) {
+                            val newGeo = targetGeo.clone() as mxGeometry
+                            newGeo.x = newTargetX
+                            graph.model.setGeometry(targetCell, newGeo)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun applyLayout() {
+        graph.model.beginUpdate()
+        try {
+            currentRule?.let {
+                applyCustomMainFlowLayout(it)
+            } ?: {
+                val layout = mxHierarchicalLayout(graph, SwingConstants.WEST)
+                layout.execute(graph.defaultParent)
+            }()
+
+            graphComponent.zoomAndCenter()
+            setZoomLevel(userZoomLevel)
+
+        } finally {
+            graph.model.endUpdate()
+        }
+    }
+
+    private fun findAllBidirectionalPairs(): List<Pair<String, String>> {
+        val rule = currentRule ?: return emptyList()
+        return GraphUtils.findAllBidirectionalPairs(rule)
+    }
+
+    private fun findNodesOnPathBetween(
+        sourceGeo: mxGeometry,
+        targetGeo: mxGeometry,
+        sourceId: String,
+        targetId: String,
+        isSourceSubStep: Boolean
+    ): List<String> {
+        return GraphPanelEdgeUtils.findNodesOnPathBetween(
+            currentRule,
+            stepToCellMap,
+            graph,
+            sourceGeo,
+            targetGeo,
+            sourceId,
+            targetId,
+            isSourceSubStep
+        )
+    }
+
+    private fun createSpecialEdges() {
+        GraphPanelEdgeUtils.createSpecialEdges(
+            graph,
+            currentRule,
+            cellToStepMap,
+            stepToCellMap,
+            ::findNodesOnPathBetween
+        )
+    }
+
 }
