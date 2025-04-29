@@ -2,6 +2,8 @@ package com.samsung.iug.ui.login
 
 import com.samsung.iug.ui.welcome.OptionScreen
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.project.Project
+import com.samsung.iug.ui.rulemaker.IUGRuleMaker
 //import javafx.application.Platform
 //import javafx.embed.swing.JFXPanel
 //import javafx.scene.Scene
@@ -11,7 +13,7 @@ import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
-class BrowserPanel : JPanel(BorderLayout()){
+class BrowserPanel(private val project: Project) : JPanel(BorderLayout()) {
 
     private val panel = JPanel(BorderLayout())
 //    TODO can not run on SRV
@@ -117,7 +119,7 @@ class BrowserPanel : JPanel(BorderLayout()){
     private fun showMainUI() {
         panel.removeAll()
         panel.add(
-            OptionScreen(username) {
+            OptionScreen(project, username) {
                 // Khi logout, hiển thị lại nút login
                 showLoginButton()
             },

@@ -21,9 +21,9 @@ import javax.swing.*
  * Logic for the top toolbar functionality
  */
 class TopToolbarLogic(
-    private val project: Project,
-    private val onRuleLoaded: (Rule) -> Unit,
-    private val getCurrentRule: () -> Rule?
+        private val project: Project,
+        private val onRuleLoaded: (Rule) -> Unit,
+        private val getCurrentRule: () -> Rule?
 ) {
     /**
      * Handle export button click
@@ -141,19 +141,11 @@ class TopToolbarLogic(
             val result = JsonHelper.exportRuleToJsonFile(rule, file)
 
             if (result.first) {
-                Messages.showInfoMessage(
-                    project,
-                    "Successfully exported rule to ${file.absolutePath}",
-                    "Export Successful"
-                )
+                Messages.showInfoMessage(project, "Successfully exported rule to ${file.absolutePath}", "Export Successful")
                 exportCompleted = true
                 dialog.dispose()
             } else {
-                Messages.showErrorDialog(
-                    project,
-                    "Failed to export rule: ${result.second ?: "Unknown error"}",
-                    "Export Failed"
-                )
+                Messages.showErrorDialog(project, "Failed to export rule: ${result.second ?: "Unknown error"}", "Export Failed")
             }
         }
 
@@ -199,12 +191,12 @@ class TopToolbarLogic(
      */
     fun exitApplication() {
         val result = Messages.showYesNoDialog(
-            project,
-            "Are you sure you want to exit the application?",
-            "Exit Confirmation",
-            "Yes",
-            "No",
-            null
+                project,
+                "Are you sure you want to exit the application?",
+                "Exit Confirmation",
+                "Yes",
+                "No",
+                null
         )
 
         if (result == Messages.YES) {

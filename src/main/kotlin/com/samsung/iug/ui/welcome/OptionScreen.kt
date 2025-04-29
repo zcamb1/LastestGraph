@@ -2,15 +2,19 @@ package com.samsung.iug.ui.welcome
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.util.IconLoader
+import com.samsung.iug.ui.rulemaker.IUGRuleMaker
+import com.intellij.openapi.project.Project
 import java.awt.*
 import java.io.File
 import javax.swing.*
 
 class OptionScreen(
+    private val project: Project,
     private val userName: String,
     private val onLogoutCallback: () -> Unit // <-- thêm callback
 ) : JPanel(BorderLayout()) {
     private val props = PropertiesComponent.getInstance()
+
     init {
 
         val topBar = JPanel(BorderLayout())
@@ -151,7 +155,8 @@ class OptionScreen(
                     if (projectDir.mkdirs()) {
                         dialog.dispose()
                         removeAll()
-                        add(CreateScreen(fullPath, userName, onLogoutCallback), BorderLayout.CENTER)
+//                        add(CreateScreen(fullPath, userName, onLogoutCallback), BorderLayout.CENTER)
+                        add(IUGRuleMaker("", userName, project))
                         revalidate()
                         repaint()
                     } else {
@@ -173,7 +178,7 @@ class OptionScreen(
             if (result == JFileChooser.APPROVE_OPTION) {
                 val path = chooser.selectedFile.absolutePath
                 removeAll()
-                add(OpenScreen(path, userName, onLogoutCallback), BorderLayout.CENTER)
+                add(IUGRuleMaker("", userName, project), BorderLayout.CENTER)
                 revalidate()
                 repaint()
             }
@@ -181,7 +186,12 @@ class OptionScreen(
 
         // Chức năng nút Join
         buttonJoin.addActionListener {
-            JOptionPane.showMessageDialog(this, "This is not supported now", "Notification", JOptionPane.INFORMATION_MESSAGE)
+            JOptionPane.showMessageDialog(
+                this,
+                "This is not supported now",
+                "Notification",
+                JOptionPane.INFORMATION_MESSAGE
+            )
         }
 
         val buttonPanel = JPanel(FlowLayout(FlowLayout.CENTER, 30, 0))
@@ -194,6 +204,7 @@ class OptionScreen(
 
         add(wrapper, BorderLayout.CENTER)
     }
+
     private fun onLogout() {
         onLogoutCallback() // <-- gọi về cha (BrowserPanel)
     }

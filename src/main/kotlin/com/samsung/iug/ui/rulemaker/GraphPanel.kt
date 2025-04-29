@@ -2,28 +2,18 @@ package com.samsung.iug.ui.rulemaker
 
 import com.samsung.iug.model.Rule
 import com.samsung.iug.model.*
-import com.intellij.icons.AllIcons
 import com.intellij.ui.JBColor
-import com.intellij.util.ui.JBUI
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
-import com.mxgraph.layout.orthogonal.mxOrthogonalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.model.mxGeometry
-import com.mxgraph.util.mxPoint
 import com.mxgraph.swing.mxGraphComponent
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.mxGraph
-import com.mxgraph.view.mxStylesheet
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Dimension
 import java.awt.FlowLayout
-import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.datatransfer.StringSelection
-import java.awt.Toolkit
-import java.util.*
 import javax.swing.*
 
 /**
@@ -46,6 +36,7 @@ class GraphPanel(
 
     private var userZoomLevel: Double = 0.9
 
+    // Constants for styling
     private val MAIN_STEP_STYLE = "mainStep"
     private val SUB_STEP_STYLE = "subStep"
     private val EDGE_STYLE = "edge"
@@ -87,7 +78,7 @@ class GraphPanel(
 
         val controlPanel = JPanel(FlowLayout(FlowLayout.LEFT))
 
-
+        // Add components to panel
         add(controlPanel, BorderLayout.NORTH)
         add(graphComponent, BorderLayout.CENTER)
 

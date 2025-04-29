@@ -8,9 +8,13 @@ import com.samsung.iug.ui.login.BrowserPanel
 
 class LoginFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val browserPanel = BrowserPanel()
-        val contentFactory = ContentFactory.getInstance()
-        val content = contentFactory.createContent(browserPanel.getComponent(), "Samsung Login", false)
+//        val browserPanel = BrowserPanel(project)
+//        val contentFactory = ContentFactory.getInstance()
+//        val content = contentFactory.createContent(browserPanel.getComponent(), "Samsung Login", false)
+//        toolWindow.contentManager.addContent(content)
+
+        val browserPanel = BrowserPanel(project)
+        val content = ContentFactory.getInstance().createContent(browserPanel.getComponent(), "", false)
         toolWindow.contentManager.addContent(content)
     }
 }

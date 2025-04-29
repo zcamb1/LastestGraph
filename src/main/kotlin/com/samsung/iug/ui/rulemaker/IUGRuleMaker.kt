@@ -16,6 +16,7 @@ import java.awt.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
 import com.samsung.iug.logic.TopToolbarLogic
+import com.samsung.iug.utils.AdbManager
 
 class IUGRuleMaker(private val path: String, private val username: String, private val project: Project) :
     JPanel(BorderLayout()) {
@@ -51,6 +52,9 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
     ) { stepA, swapId -> nodeLogic.onSwapNode(stepA, swapId) }
 
     init {
+        // ADB
+        AdbManager.initializeAdb()
+
         val logPanelContainer = LogPanel().apply {
             preferredWidth = 400
             maximumWidth = 400
