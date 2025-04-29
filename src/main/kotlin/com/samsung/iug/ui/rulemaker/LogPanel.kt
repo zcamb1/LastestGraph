@@ -21,7 +21,7 @@ class LogPanel : JPanel(BorderLayout()) {
     private val logList = JBList(logListModel)
 
     private val logLevelFilter = ComboBox(arrayOf("ALL", "DEBUG", "INFO", "WARN", "ERROR"))
-    private val tagFilterField = JTextField(15)
+    private val tagFilterField = JTextField(10)
 
     init {
         border = BorderFactory.createTitledBorder(

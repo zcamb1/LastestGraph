@@ -75,8 +75,8 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         AdbManager.initializeAdb()
 
         val logPanelContainer = LogPanel().apply {
-            preferredWidth = 400
-            maximumWidth = 400
+            preferredWidth = 450
+            maximumWidth = 450
         }
         Log.init(logPanelContainer)
 
