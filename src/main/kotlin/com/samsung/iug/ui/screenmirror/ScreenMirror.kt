@@ -2,6 +2,9 @@ package com.samsung.iug.ui.screenmirror
 
 import com.samsung.iug.adb.GetAdb
 import com.samsung.iug.adb.getScrcpy
+import com.samsung.iug.service.Log
+import com.samsung.iug.ui.layoutinspector.LayoutInspectorPanel
+import com.samsung.iug.ui.layoutinspector.LayoutParser
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Java2DFrameConverter
 import java.awt.BorderLayout
@@ -15,6 +18,9 @@ object ScreenMirror {
     val adbPath = GetAdb().absolutePath
     private var mouseListener: MouseAdapter? = null
     private var isStream = false
+    var layoutInspectorPanel: LayoutInspectorPanel? = null
+    private var layoutRefreshTimer: Timer? = null
+    var isControl = false
 
     init {
         panel.add(imageLabel, BorderLayout.CENTER)
@@ -65,21 +71,66 @@ object ScreenMirror {
         isStream = true
         imageLabel.text = "Connecting..."
         Thread { startScrcpyAndStream(device) }.start()
+        startRefreshingLayout(device)
+
+        imageLabel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (isControl) return
+
+                val (realX, realY) = mapToDevice(e.x, e.y, device)
+
+                val viewNode = layoutInspectorPanel?.getAllNodes()?.lastOrNull {
+                    it.bounds.contains(realX, realY)
+                }
+                viewNode?.let { node ->
+                    layoutInspectorPanel?.scrollToViewNode(node)
+
+//                    Log.d("ScreenMirror", """
+//                ==== Clicked Node Info ====
+//                resourceId: ${node.resourceId}
+//                className : ${node.className}
+//                bounds    : ${node.bounds}
+//                text      : ${node.text}
+//                children  : ${node.children.size}
+//                ============================
+//            """.trimIndent())
+                    Log.d("ScreenMirror", "Clicked Element Info: resourceId: ${node.resourceId}, " +
+                            "className: ${node.className}, text: ${node.text}, children: ${node.children}")
+                }
+            }
+        })
+    }
+
+    private fun startRefreshingLayout(device: String) {
+        layoutRefreshTimer?.stop()
+
+        layoutRefreshTimer = Timer(2000) {
+            val nodes = LayoutParser.parse(device)
+            if (nodes != null && nodes.isNotEmpty()) {
+                layoutInspectorPanel?.updateTree(nodes)
+            }
+        }
+        layoutRefreshTimer?.start()
     }
 
     fun stopStream(device: String) {
+        layoutRefreshTimer?.stop()
+        layoutRefreshTimer = null
         isStream = false
         SwingUtilities.invokeLater {
             imageLabel.icon = null
             imageLabel.text = "Not connect"
             imageLabel.revalidate()
             imageLabel.repaint()
+
+//            layoutInspectorPanel?.clearTree()
         }
         ProcessBuilder(adbPath, "-s", device, "forward", "--remove", "tcp:27183").start().waitFor()
         ProcessBuilder(adbPath, "-s", device, "shell", "pkill", "-f", "scrcpy").start().waitFor()
     }
 
     fun startControl(device: String) {
+        isControl = true
         mouseListener = object : MouseAdapter() {
             private var lastX = -1
             private var lastY = -1
@@ -104,6 +155,7 @@ object ScreenMirror {
     }
 
     fun stopControl() {
+        isControl = false
         mouseListener?.let {
             imageLabel.removeMouseListener(it)
             mouseListener = null
@@ -120,6 +172,12 @@ object ScreenMirror {
             ProcessBuilder(adbPath, "-s", device, "push", localPath, serverPath).start().waitFor()
             ProcessBuilder(adbPath, "-s", device, "forward", "tcp:27183", "localabstract:scrcpy").start().waitFor()
 
+            val nodes = LayoutParser.parse(device)
+            nodes?.let {
+                SwingUtilities.invokeLater {
+                    layoutInspectorPanel?.updateTree(it)
+                }
+            }
 
             val command = listOf(
                 adbPath,

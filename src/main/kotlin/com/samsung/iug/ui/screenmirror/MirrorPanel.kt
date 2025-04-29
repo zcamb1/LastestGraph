@@ -2,7 +2,7 @@ package com.samsung.iug.ui.screenmirror
 
 import com.intellij.ui.util.minimumWidth
 import com.samsung.iug.ui.rulemaker.CommonInfoPanel
-import com.samsung.iug.ui.rulemaker.LayoutInspectorPanel
+import com.samsung.iug.ui.layoutinspector.LayoutInspectorPanel
 import com.samsung.iug.ui.rulemaker.ScreenInfoPanel
 import java.awt.BorderLayout
 import java.awt.Color
@@ -41,7 +41,10 @@ class MirrorPanel : JPanel(BorderLayout()) {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
             )
             add(screenInfoPanel)
-            add(LayoutInspectorPanel())
+//            add(LayoutInspectorPanel())
+            val layoutInspectorPanel = LayoutInspectorPanel()
+            ScreenMirror.layoutInspectorPanel = layoutInspectorPanel
+            add(layoutInspectorPanel)
         }
 
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, screenMirror, infoPanel).apply {
