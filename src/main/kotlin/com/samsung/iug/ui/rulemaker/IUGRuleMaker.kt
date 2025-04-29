@@ -30,11 +30,30 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         ::setRule
     ) { currentRule }
 
+
+    val tabbedPane = JTabbedPane().apply {
+        foreground = Color.WHITE
+        addTab("Step Info", stepInfoPanel)
+        addTab("Common Info", commonInfoContent)
+        selectedIndex = 0
+    }
+
+    val combinedTabPanel = createCombinedTabPanel(tabbedPane).apply {
+        preferredHeight = 650
+        preferredWidth = 200
+        maximumWidth = 200
+    }
+
+
     private val nodeLogic: NodeInteractionLogic = NodeInteractionLogic(
         getCurrentRule = { currentRule },
         setRule = { rule -> currentRule = rule },
         refreshGraph = { graphPanel.refreshGraph() },
-        showStepInEditor = { step -> stepInfoPanel.setStep(step) },
+        showStepInEditor = { step -> stepInfoPanel.setStep(step)
+            val stepInfoTabIndex = tabbedPane.indexOfTab("Step Info")
+            if (stepInfoTabIndex != -1){
+                tabbedPane.selectedIndex = stepInfoTabIndex
+            }},
         createNewStep = { isSubStep -> editorLogic.createNewStep(isSubStep) },
         getCellForStep = { stepId -> graphPanel.getCellForStep(stepId) },
         getCellGeometry = { cell -> graphPanel.getCellGeometry(cell) },
@@ -67,11 +86,6 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         }
 
         // Center layout: Common Info, Step Info, Mirror, Screen Info
-        val combinedTabPanel = createCombinedTabPanel().apply {
-            preferredHeight = 650
-            preferredWidth = 200
-            maximumWidth = 200
-        }
         val mirrorPanel = MirrorPanel().apply {
             preferredHeight = 650
         }
@@ -171,16 +185,9 @@ class IUGRuleMaker(private val path: String, private val username: String, priva
         return panel
     }
 
-    private fun createCombinedTabPanel(): JPanel {
-        val tabbedPane = JTabbedPane().apply {
-            foreground = Color.WHITE
-            addTab("Step Info", stepInfoPanel)
-            addTab("Common Info", commonInfoContent)
-            selectedIndex = 0
-        }
-
+    private fun createCombinedTabPanel(tabbedPane: JTabbedPane): JPanel {
         val panel = JPanel(BorderLayout()).apply {
-            add(tabbedPane, BorderLayout.CENTER)
+            add(this@IUGRuleMaker.tabbedPane, BorderLayout.CENTER)
             border = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.GRAY),
                 "",

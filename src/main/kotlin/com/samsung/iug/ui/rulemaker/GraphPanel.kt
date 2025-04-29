@@ -470,12 +470,6 @@ class GraphPanel(
     private fun showEmptySpaceContextMenu(x: Int, y: Int) {
         val popup = JPopupMenu()
 
-        val addStepItem = JMenuItem("Add New Step")
-        addStepItem.addActionListener { onAddStep(null,null,null) }
-        popup.add(addStepItem)
-
-        // Add layout menu item
-        popup.addSeparator()
         val layoutItem = JMenuItem("Rearrange Layout")
         layoutItem.addActionListener {
             applyLayout()
