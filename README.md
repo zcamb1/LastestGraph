@@ -47,3 +47,6 @@ Log.d("MyPlugin", "Debug message")
 Log.i("ADB", "Connection successfully")
 Log.w("Stream", "Slow query detected")
 Log.e("Crash", "Unhandled exception")
+```
+
+
