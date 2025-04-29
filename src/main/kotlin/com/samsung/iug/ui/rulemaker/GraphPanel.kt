@@ -502,6 +502,18 @@ class GraphPanel(
         ensureNodesVisible()
     }
 
+    private fun findStartNodes(rule: Rule): List<String> {
+        return GraphUtils.findStartNodes(rule)
+    }
+
+    private fun findEndNodes(rule: Rule): List<String> {
+        return GraphUtils.findEndNodes(rule)
+    }
+
+    private fun reconstructPath(parentMap: Map<String, String>, startNodeId: String, endNodeId: String): List<String> {
+        return GraphUtils.reconstructPath(parentMap, startNodeId, endNodeId)
+    }
+
     private fun identifyMainFlowPath(rule: Rule): List<String> {
         return GraphUtils.identifyMainFlowPath(rule)
     }
@@ -596,6 +608,22 @@ class GraphPanel(
             stepToCellMap,
             ::findNodesOnPathBetween
         )
+    }
+
+    private fun configureSubToSubEdge(edge: mxCell, source: mxCell, target: mxCell) {
+        GraphPanelEdgeUtils.configureSubToSubEdge(graph, edge)
+    }
+
+    private fun configureMainToMainEdge(edge: mxCell, source: mxCell, target: mxCell) {
+        GraphPanelEdgeUtils.configureMainToMainEdge(graph, edge)
+    }
+
+    private fun configureMainToSubEdge(edge: mxCell, source: mxCell, target: mxCell) {
+        GraphPanelEdgeUtils.configureMainToSubEdge(graph, edge, source, target, cellToStepMap)
+    }
+
+    private fun configureSubToMainEdge(edge: mxCell, source: mxCell, target: mxCell) {
+        GraphPanelEdgeUtils.configureSubToMainEdge(graph, edge, source, target, cellToStepMap, ::findNodesOnPathBetween, stepToCellMap)
     }
 
 }
