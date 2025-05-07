@@ -6,6 +6,12 @@ import com.intellij.openapi.wm.ToolWindowFactory
 
 class IUGFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        // TODO
+        toolWindow.isShowStripeButton = false
+        toolWindow.hide(null)
+        IUGUI(project)
+    }
+
+    override fun shouldBeAvailable(project: Project): Boolean {
+        return true
     }
 }
