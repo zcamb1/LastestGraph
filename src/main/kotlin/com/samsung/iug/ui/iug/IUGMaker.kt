@@ -23,7 +23,7 @@ fun IUGMaker(project: Project) {
             isOpaque = false
             bounds = Rectangle(0, 0, screenWidth, screenHeight)
 
-            val panel = MainUI(screenWidth, screenHeight) {
+            val panel = MainUI((screenWidth * 0.9).toInt(), screenHeight) {
                 frame.dispose()
             }
             panel.setBounds(regionX, regionY, regionWidth, regionHeight)
