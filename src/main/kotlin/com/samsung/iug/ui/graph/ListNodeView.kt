@@ -2,6 +2,7 @@ package com.samsung.iug.ui.graph
 
 import com.intellij.ui.util.preferredHeight
 import com.intellij.ui.util.preferredWidth
+import com.samsung.iug.graph.listNode
 import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.JButton

@@ -1,17 +1,13 @@
 package com.samsung.iug.ui.preview
 
 import com.android.ddmlib.IDevice
-import com.intellij.icons.AllIcons.*
+import com.intellij.icons.AllIcons.Actions
 import com.intellij.openapi.diagnostic.thisLogger
-import com.samsung.iug.utils.AdbUtils
+import com.samsung.iug.device.AdbUtils
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
-import javax.swing.BorderFactory
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
-import java.awt.Color
+import javax.swing.*
 
 object GetDevice {
     val panel: JPanel

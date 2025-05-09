@@ -1,5 +1,7 @@
 package com.samsung.iug.ui.graph
 
+import com.samsung.iug.graph.Node
+import com.samsung.iug.graph.listNode
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

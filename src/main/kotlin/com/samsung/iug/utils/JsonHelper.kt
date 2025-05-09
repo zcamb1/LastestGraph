@@ -1,7 +1,6 @@
 package com.samsung.iug.utils
 
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.samsung.iug.graph.Node
 import java.io.File
@@ -27,12 +26,12 @@ object JsonHelper {
         }
     }
 
-    fun parseRuleFromJson(file: File):List<Node>{
+    fun parseRuleFromJson(file: File): List<Node> {
         val jsonStr = file.readText()
-        return gson.fromJson(jsonStr, object : TypeToken<List<Node>>() {}.type)
-    }
-
-    fun parseRuleFromJson(jsonObject: JsonObject): List<Node> {
-        return fromJson<List<Node>>(jsonObject.toString())
+        return try {
+            gson.fromJson(jsonStr, object : TypeToken<List<Node>>() {}.type)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }

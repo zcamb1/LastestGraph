@@ -1,9 +1,8 @@
-package com.samsung.iug.utils
+package com.samsung.iug.device
 
 import com.android.ddmlib.AndroidDebugBridge
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener
 import com.android.ddmlib.IDevice
-import com.samsung.iug.device.getAdb
 
 object AdbUtils: IDeviceChangeListener {
     private var bridge: AndroidDebugBridge? = null

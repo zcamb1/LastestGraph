@@ -2,7 +2,7 @@ package com.samsung.iug.graph
 
 import java.awt.Rectangle
 
-data class Node (
+class Node (
     var id: String,
     var x: Int = 0,
     var y: Int = 0,
@@ -19,13 +19,13 @@ data class Node (
     var guildContent: String = ""
 )
 
-data class Edge (
+class Edge (
     val from: Node,
     val to: Node
 )
 
 object listNode {
-    val listNode = mutableListOf<Node>(Node("1"), Node("2")) // TODO clean listNode
+    val listNode = mutableListOf<Node>()
 }
 
 object listEdge {

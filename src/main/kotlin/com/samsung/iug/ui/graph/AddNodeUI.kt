@@ -1,5 +1,7 @@
 package com.samsung.iug.ui.graph
 
+import com.samsung.iug.graph.Node
+import com.samsung.iug.graph.listNode
 import com.samsung.iug.ui.mirror.ScreenLayout
 import java.awt.*
 import javax.swing.*

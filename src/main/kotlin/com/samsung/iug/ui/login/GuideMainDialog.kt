@@ -230,9 +230,11 @@ class GuideMainDialog : JDialog() {
         } while (file.exists())
 
         file.writeText("This is a new guide.")
-        JOptionPane.showMessageDialog(this, "File created: ${file.absolutePath}")
-        isVisible = false
-        ScreenManager.instance.showIUGMakerScreen()
+        if (FileStorage.openProject(file.absolutePath)) {
+            JOptionPane.showMessageDialog(this, "File created: ${file.absolutePath}")
+            isVisible = false
+            ScreenManager.instance.showIUGMakerScreen()
+        }
     }
 
     private fun openGuide() {
@@ -241,6 +243,7 @@ class GuideMainDialog : JDialog() {
             fileFilter = javax.swing.filechooser.FileNameExtensionFilter("IUG Files", "IUG")
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            FileStorage.openProject(chooser.selectedFile.absolutePath)
             ScreenManager.instance.showIUGMakerScreen()
         }
     }

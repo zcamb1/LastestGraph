@@ -30,8 +30,7 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
 
         FileStorage.currentFile?.let {
             val data = JsonHelper.parseRuleFromJson(it)
-            println("hehe")
-            println(data)
+            listNode.listNode.addAll(data)
         }
         add(topBar)
         add(mainPanel)
@@ -120,24 +119,6 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
                 add(buttonZoomOut)
                 add(buttonZoomIn)
                 add(buttonPan)
-            }
-
-            buttonMirror.addActionListener {
-                FileStorage.currentFile?.let { file ->
-                    val result = JsonHelper.exportRuleToJsonFile(listNode.listNode, file)
-
-                    if (result.first) {
-                        JOptionPane.showMessageDialog(
-                            this@MainUI,
-                            "Successfully exported rule: ${result.second}"
-                        )
-                    } else {
-                        JOptionPane.showMessageDialog(
-                            this@MainUI,
-                            "Failed to export rule: ${result.second ?: "Unknown error"}"
-                        )
-                    }
-                }
             }
 
             add(panelGroup)
