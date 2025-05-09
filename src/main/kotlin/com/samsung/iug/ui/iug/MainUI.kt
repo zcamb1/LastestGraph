@@ -1,8 +1,10 @@
 package com.samsung.iug.ui.iug
 
 import com.intellij.util.ui.JBUI
+import com.samsung.iug.log.Log
 import com.samsung.iug.ui.custom.CircleIconButton
 import com.samsung.iug.ui.custom.RoundedPanel
+import com.samsung.iug.ui.log.LogPanel
 import com.samsung.iug.ui.graph.GraphUI
 import com.samsung.iug.ui.preview.PreviewPanel
 import com.samsung.iug.utils.ImageHelper
@@ -17,7 +19,17 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
     private var isPreviewVisible = false
     private val graphPanel = GraphUI()
 
+    private var logPanel = LogPanel().apply {
+        isVisible = false
+        background = Color.DARK_GRAY
+        preferredSize = Dimension(600, 200)
+        maximumSize = preferredSize
+        alignmentX = 0.8f
+        alignmentY = 0.8f
+    }
+
     init {
+        Log.init(logPanel)
         preferredSize = Dimension(Toolkit.getDefaultToolkit().screenSize)
         border = EmptyBorder((screenHeight * 0.05).toInt(), 0, (screenHeight * 0.05).toInt(), 0)
 
@@ -68,6 +80,7 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
 
             add(toolBars)
             add(graphPanel)
+            add(logPanel)
         }
     }
 
@@ -106,6 +119,12 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
             val buttonMirror = createToolBarCircleButton("/images/icon_flip.png")
             val buttonConsole = createToolBarCircleButton("/images/icon_terminal.png")
             val buttonMore = createToolBarCircleButton("/images/icon_more.png")
+
+            buttonConsole.addActionListener {
+                logPanel.isVisible = !logPanel.isVisible
+                revalidate()
+                repaint()
+            }
 
             add(panelGroup)
             add(buttonPreview)

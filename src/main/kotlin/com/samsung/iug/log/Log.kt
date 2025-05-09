@@ -18,11 +18,6 @@ object Log {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
         val entry = LogEntry(timestamp, level, tag, message)
         logPanel?.appendLog(entry)
-
-        val project = com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
-        val toolWindow = com.intellij.openapi.wm.ToolWindowManager.getInstance(project ?: return)
-            .getToolWindow("LogWindow")
-        toolWindow?.show()
     }
 
     fun d(tag: String, message: String) = log(LogLevel.DEBUG, tag, message)

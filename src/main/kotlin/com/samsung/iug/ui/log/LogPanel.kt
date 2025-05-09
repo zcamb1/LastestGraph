@@ -25,29 +25,29 @@ class LogPanel : JPanel(BorderLayout()) {
 
     init {
         logList.cellRenderer = LogCellRenderer()
-        border = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GRAY),
-            "Log",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            null,
-            Color.WHITE
-        )
+//        border = BorderFactory.createTitledBorder(
+//            BorderFactory.createLineBorder(Color.GRAY),
+//            "Log",
+//            TitledBorder.LEFT,
+//            TitledBorder.TOP,
+//            null,
+//            Color.WHITE
+//        )
 
         // Top control panel
         val controls = JPanel(FlowLayout(FlowLayout.LEFT))
-        controls.add(JLabel("Level:"))
+        controls.add(JLabel("Log:"))
         controls.add(logLevelFilter)
         controls.add(JLabel("Tag:"))
         controls.add(tagFilterField)
 
-        val copyButton = JButton("Copy All").apply {
-            addActionListener {
-                val combined = allLogs.joinToString("\n") { it.toString() }
-                val selection = StringSelection(combined)
-                Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, null)
-            }
-        }
+//        val copyButton = JButton("Copy All").apply {
+//            addActionListener {
+//                val combined = allLogs.joinToString("\n") { it.toString() }
+//                val selection = StringSelection(combined)
+//                Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, null)
+//            }
+//        }
 
         val exportButton = JButton("Export Log").apply {
             addActionListener {
@@ -79,7 +79,7 @@ class LogPanel : JPanel(BorderLayout()) {
             }
         }
 
-        controls.add(copyButton)
+//        controls.add(copyButton)
         controls.add(exportButton)
         controls.add(clearButton)
 
