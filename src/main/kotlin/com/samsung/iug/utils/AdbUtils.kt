@@ -3,12 +3,13 @@ package com.samsung.iug.utils
 import com.android.ddmlib.AndroidDebugBridge
 import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener
 import com.android.ddmlib.IDevice
-import com.samsung.iug.adb.GetAdb
+import com.samsung.iug.device.getAdb
 
 object AdbUtils: IDeviceChangeListener {
     private var bridge: AndroidDebugBridge? = null
     private val listeners = mutableListOf<(List<IDevice>) -> Unit> ()
-    private val adbPath = GetAdb().absolutePath
+//    private val adbPath = GetAdb().absolutePath
+    private val adbPath = getAdb().absolutePath
 
     fun initAdb() {
         AndroidDebugBridge.initIfNeeded(false)

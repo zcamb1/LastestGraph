@@ -1,7 +1,7 @@
 package com.samsung.iug.ui.preview
 
-import com.samsung.iug.adb.GetAdb
-import com.samsung.iug.adb.getScrcpy
+import com.samsung.iug.device.getScrcpy
+import com.samsung.iug.device.getAdb
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Java2DFrameConverter
 import java.awt.BorderLayout
@@ -12,7 +12,8 @@ import javax.swing.*
 object ScreenMirror {
     val panel = JPanel(BorderLayout())
     private val imageLabel = JLabel("Not connect", SwingConstants.CENTER)
-    val adbPath = GetAdb().absolutePath
+//    val adbPath = GetAdb().absolutePath
+    val adbPath = getAdb().absolutePath
     private var mouseListener: MouseAdapter? = null
     private var isStream = false
 
@@ -112,6 +113,7 @@ object ScreenMirror {
 
     private fun startScrcpyAndStream(device: String) {
         try {
+//            val localPath = getScrcpy().absolutePath
             val localPath = getScrcpy().absolutePath
             val serverPath = "/data/local/tmp/scrcpy-server-v3.2.jar"
 

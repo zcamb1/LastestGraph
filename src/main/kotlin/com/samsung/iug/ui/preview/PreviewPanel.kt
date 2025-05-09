@@ -1,6 +1,5 @@
 package com.samsung.iug.ui.preview
 
-import com.samsung.iug.utils.GetDevice
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder

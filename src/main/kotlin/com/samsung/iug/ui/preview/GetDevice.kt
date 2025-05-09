@@ -1,9 +1,9 @@
-package com.samsung.iug.utils
+package com.samsung.iug.ui.preview
 
 import com.android.ddmlib.IDevice
 import com.intellij.icons.AllIcons.*
 import com.intellij.openapi.diagnostic.thisLogger
-import com.samsung.iug.ui.preview.ScreenMirror
+import com.samsung.iug.utils.AdbUtils
 import java.awt.Dimension
 import java.awt.FlowLayout
 import javax.swing.BorderFactory
