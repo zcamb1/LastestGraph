@@ -4,7 +4,7 @@ import com.samsung.iug.ui.custom.JTextFieldCustom
 import java.awt.*
 import javax.swing.*
 
-class CommonInfoLayout : JPanel() {
+object CommonInfoLayout : JPanel() {
     private val mainContent = JPanel(GridBagLayout())
     init {
         this.apply {
@@ -92,6 +92,7 @@ class CommonInfoLayout : JPanel() {
     }
 
     fun fillData() {
+        mainContent.removeAll()
         mainContent.apply {
             val gbcLabel = GridBagConstraints().apply {
                 gridx = 0
@@ -145,5 +146,7 @@ class CommonInfoLayout : JPanel() {
             gbcInput.gridy = i
             add(bounds, gbcInput)
         }
+        repaint()
+        revalidate()
     }
 }

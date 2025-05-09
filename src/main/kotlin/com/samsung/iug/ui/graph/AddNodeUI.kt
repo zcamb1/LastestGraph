@@ -10,7 +10,7 @@ class AddNodeUI(): JPanel(BorderLayout()) {
     private val dotsPanel = JPanel()
     private val navigationPanel = JPanel()
 
-    private val backButton = JButton("Back")
+    private val backButton = JButton("Close")
     private val nextButton = JButton("Next")
     private val dots = mutableListOf<JLabel>()
 
@@ -18,8 +18,8 @@ class AddNodeUI(): JPanel(BorderLayout()) {
     private val totalTabs = 3
 
     private val screenLayout = ScreenLayout()
-    private var stepDetails = StepDetailsLayout()
-    private var commonInfo = CommonInfoLayout()
+    private var stepDetails = StepDetailsLayout
+    private var commonInfo = CommonInfoLayout
 
     init {
         this.apply {
@@ -72,31 +72,39 @@ class AddNodeUI(): JPanel(BorderLayout()) {
 
     private fun showNextTab() {
         if (currentIndex < totalTabs - 1) {
-//            contentPanel.remove(stepDetails)
-//            contentPanel.remove(commonInfo)
-//            stepDetails = StepDetailsLayout()
-//            commonInfo = CommonInfoLayout()
-//            contentPanel.add(stepDetails, "tab1")
-//            contentPanel.add(commonInfo, "tab2")
+            stepDetails.fillData()
+            commonInfo.fillData()
             currentIndex++
             cardLayout.show(contentPanel, "tab$currentIndex")
             updateDots()
             updateNavigationButtons()
+        } else {
+            val node = Node("")
+            val data = stepDetails.getData()
+            node.id = data["stepId"].toString()
+            node.guildContent = data["guideContent"].toString()
+            node.screenId = ViewNode.screenId
+            node.className = ViewNode.className
+            node.resourceId = ViewNode.resourceId
+            node.text = ViewNode.text
+            node.bounds = ViewNode.bounds
+            listNode.listNode.add(node)
+//            ListNodeView.repaintView()
+            ViewNode.reset()
+            GraphUI.closeNode()
         }
     }
 
     private fun showPreviousTab() {
         if (currentIndex > 0) {
-//            contentPanel.remove(stepDetails)
-//            contentPanel.remove(commonInfo)
-//            stepDetails = StepDetailsLayout()
-//            commonInfo = CommonInfoLayout()
-//            contentPanel.add(stepDetails, "tab1")
-//            contentPanel.add(commonInfo, "tab2")
+            stepDetails.fillData()
+            commonInfo.fillData()
             currentIndex--
             cardLayout.show(contentPanel, "tab$currentIndex")
             updateDots()
             updateNavigationButtons()
+        } else {
+            GraphUI.closeNode()
         }
     }
 
@@ -115,11 +123,16 @@ class AddNodeUI(): JPanel(BorderLayout()) {
     private fun updateNavigationButtons() {
         backButton.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         nextButton.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-        backButton.isEnabled = currentIndex > 0
         if (currentIndex == totalTabs - 1) {
             nextButton.text = "Create"
         } else {
             nextButton.text = "Next"
+        }
+
+        if (currentIndex == 0) {
+            backButton.text = "Close"
+        } else {
+            backButton.text = "Back"
         }
     }
 }

@@ -13,7 +13,7 @@ class JTextFieldCustom(private val placeholder: String, private val height: Int)
     init {
         text = placeholder
         font = Font("Arial", Font.BOLD, 14)
-        foreground = Color.GRAY
+        foreground = Color.WHITE
         border = BorderFactory.createEmptyBorder(5, 10, 5, 5)
         preferredHeight = height
         preferredWidth = 200
@@ -30,7 +30,7 @@ class JTextFieldCustom(private val placeholder: String, private val height: Int)
             override fun focusLost(e: FocusEvent?) {
                 if (text.isEmpty()) {
                     text = placeholder
-                    foreground = Color.LIGHT_GRAY
+                    foreground = Color.WHITE
                 }
             }
         })
@@ -40,13 +40,13 @@ class JTextFieldCustom(private val placeholder: String, private val height: Int)
         val g2 = g as Graphics2D
 
         g2.color = Color.BLACK
-        g2.fillRoundRect(0, 0, width, height, 25, 25)
+        g2.fillRoundRect(1, 1, width - 1, height - 1, 5, 5)
 
         super.paintComponent(g)
 
         g2.color = Color.GRAY
         g2.stroke = BasicStroke(2f)
-        g2.drawRoundRect(0, 0, width - 1, height - 1, 25, 25)
+        g2.drawRoundRect(0, 0, width - 1, height - 1, 5, 5)
 
     }
 }

@@ -17,7 +17,6 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
     private lateinit var buttonPreview: JButton
     private var previewDialog: JDialog? = null
     private var isPreviewVisible = false
-    private val graphPanel = GraphUI()
 
     private var logPanel = LogPanel().apply {
         isVisible = false
@@ -28,6 +27,7 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
         alignmentY = 0.8f
     }
 
+    private val graphPanel = GraphUI
     init {
         Log.init(logPanel)
         preferredSize = Dimension(Toolkit.getDefaultToolkit().screenSize)

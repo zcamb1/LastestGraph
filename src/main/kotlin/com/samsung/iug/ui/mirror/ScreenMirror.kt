@@ -1,6 +1,7 @@
 package com.samsung.iug.ui.mirror
 
 import com.samsung.iug.device.getAdb
+import com.samsung.iug.ui.graph.GraphUI
 import com.samsung.iug.ui.graph.ViewNode
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -65,8 +66,7 @@ class ScreenMirror(): JPanel(BorderLayout()) {
             val nodeList = doc.getElementsByTagName("node")
 
             val rootNode = nodeList.item(0) as Element
-            println(rootNode)
-            ViewNode.screenId = rootNode.getAttribute("package")
+            ViewNode.currentScreen = rootNode.getAttribute("package")
 
             val boundsList = mutableListOf<Node>()
 
@@ -125,6 +125,7 @@ class ImagePanel: JPanel() {
                 selectedRect = selectedNode?.bounds
 
                 if (selectedRect != null) {
+                    ViewNode.screenId = ViewNode.currentScreen
                     ViewNode.className = selectedNode!!.className
                     ViewNode.resourceId = selectedNode!!.resourceId
                     ViewNode.text = selectedNode!!.text
@@ -162,16 +163,22 @@ class ImagePanel: JPanel() {
                 val h = (rect.bounds.width / 5)
 
                 if (rect.bounds == selectedRect) {
+                    g2d.color = Color(255, 0, 0, 60)
+                    g2d.stroke = BasicStroke(2f)
+                    g2d.fillOval(x1, y1, w, h)
+
                     g2d.color = Color.RED
+                    g2d.stroke = BasicStroke(2f)
+                    g2d.drawOval(x1, y1, w, h)
                 } else {
                     g2d.color = Color.YELLOW
+                    g2d.stroke = BasicStroke(2f)
+                    g2d.drawOval(x1, y1, w, h)
                 }
-
-                g2d.stroke = BasicStroke(2f)
-                g2d.drawOval(x1, y1, w, h)
             }
             revalidate()
             repaint()
+            GraphUI.repaintLayered()
         }
     }
 
