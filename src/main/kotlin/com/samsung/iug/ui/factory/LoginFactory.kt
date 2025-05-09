@@ -1,4 +1,4 @@
-package com.samsung.iug.ui
+package com.samsung.iug.ui.factory
 
 import com.samsung.iug.ui.login.LoginDialog
 import com.intellij.openapi.project.Project

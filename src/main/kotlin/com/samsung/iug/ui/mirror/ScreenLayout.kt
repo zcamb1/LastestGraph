@@ -1,8 +1,7 @@
-package com.samsung.iug.ui
+package com.samsung.iug.ui.mirror
 
 import java.awt.Color
 import java.awt.Component
-import java.awt.FlowLayout
 import java.awt.Font
 import javax.swing.BorderFactory
 import javax.swing.Box

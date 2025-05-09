@@ -2,7 +2,7 @@ package com.samsung.iug.ui.log
 
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBList
-import com.samsung.iug.model.LogEntry
+import com.samsung.iug.log.model.LogEntry
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.awt.Toolkit

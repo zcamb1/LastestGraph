@@ -28,7 +28,8 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="IUG Plugin"
-                    factoryClass="com.samsung.iug.factory.IUGFactory"
+                    factoryClass="com.samsung.iug.ui.factory.LoginFactory"
+                    icon="AllIcons.Actions.Checked"
                     anchor="left"
         />
     </extensions>

@@ -1,4 +1,4 @@
-package com.samsung.iug.model
+package com.samsung.iug.log.model
 
 data class LogEntry(
     val timestamp: String,

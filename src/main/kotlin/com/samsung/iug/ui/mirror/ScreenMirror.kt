@@ -1,4 +1,4 @@
-package com.samsung.iug.ui
+package com.samsung.iug.ui.mirror
 
 import java.awt.BorderLayout
 import javax.swing.*

@@ -1,4 +1,4 @@
-package com.samsung.iug.service
+package com.samsung.iug.log
 
 import com.samsung.iug.model.LogEntry
 import com.samsung.iug.model.LogLevel

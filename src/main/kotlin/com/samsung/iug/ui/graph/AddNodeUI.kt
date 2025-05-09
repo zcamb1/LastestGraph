@@ -1,5 +1,6 @@
-package com.samsung.iug.ui
+package com.samsung.iug.ui.graph
 
+import com.samsung.iug.ui.ScreenLayout
 import java.awt.*
 import javax.swing.*
 
