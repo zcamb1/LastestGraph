@@ -1,10 +1,10 @@
 package com.samsung.iug.ui.login
 
+import com.samsung.iug.ui.manage.ScreenManager
 import java.awt.*
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import javax.swing.JButton
 
 class LoginDialog : JDialog() {
 
@@ -89,7 +89,7 @@ class LoginDialog : JDialog() {
             alignmentX = Component.CENTER_ALIGNMENT
             addActionListener {
                 dispose()
-                GuideMainDialog().isVisible = true
+                ScreenManager.instance.showGuideMainScreen()
 //    can not run on SRV
 //                WebViewDialog().isVisible = true
             }

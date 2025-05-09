@@ -1,13 +1,16 @@
 package com.samsung.iug.ui.iug
 
 import com.intellij.util.ui.JBUI
+import com.samsung.iug.graph.listNode
 import com.samsung.iug.log.Log
 import com.samsung.iug.ui.custom.CircleIconButton
 import com.samsung.iug.ui.custom.RoundedPanel
-import com.samsung.iug.ui.log.LogPanel
 import com.samsung.iug.ui.graph.GraphUI
+import com.samsung.iug.ui.log.LogPanel
 import com.samsung.iug.ui.preview.PreviewPanel
+import com.samsung.iug.utils.FileStorage
 import com.samsung.iug.utils.ImageHelper
+import com.samsung.iug.utils.JsonHelper
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
@@ -36,6 +39,11 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
         val topBar = createTopBar()
         val mainPanel = createMainLayout()
 
+        FileStorage.currentFile?.let {
+            val data = JsonHelper.parseRuleFromJson(it)
+            println("hehe")
+            println(data)
+        }
         add(topBar)
         add(mainPanel)
     }
@@ -116,7 +124,22 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
                     togglePreview()
                 }
             }
-            val buttonMirror = createToolBarCircleButton("/images/icon_flip.png")
+            val buttonMirror = createToolBarCircleButton("/images/icon_flip.png").apply {
+                addActionListener {
+                    FileStorage.currentFile?.let { file ->
+                        val result = JsonHelper.exportRuleToJsonFile(listNode.listNode, file)
+
+                        if (result.first) {
+                            JOptionPane.showMessageDialog(this@MainUI, "Successfully exported rule: ${result.second}")
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                this@MainUI,
+                                "Failed to export rule: ${result.second ?: "Unknown error"}"
+                            )
+                        }
+                    }
+                }
+            }
             val buttonConsole = createToolBarCircleButton("/images/icon_terminal.png")
             val buttonMore = createToolBarCircleButton("/images/icon_more.png")
 

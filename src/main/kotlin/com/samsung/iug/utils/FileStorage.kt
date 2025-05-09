@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 
-object RecentFileStorage {
+object FileStorage {
     private const val MAX_RECENT = 10
     private val gson = Gson()
 
@@ -15,27 +15,25 @@ object RecentFileStorage {
         }
     }
 
-    private var recentPaths: MutableList<String> = loadFromDisk()
+    private var recentPaths: MutableList<String> = loadRecentListFromDisk()
+    var currentFile: File? = null
 
-    // TODO: gọi khi tạo project mới và mở project cũ (nếu prj cũ k tồn tại gọi remove)
-    fun add(path: String) {
+    fun addRecent(path: String) {
         recentPaths.remove(path)
         recentPaths.add(0, path)
         if (recentPaths.size > MAX_RECENT) {
             recentPaths = recentPaths.take(MAX_RECENT).toMutableList()
         }
-        saveToDisk()
+        saveRecentListToDisk()
     }
 
-    // TODO gọi mỗi khi mở màn open recent guide
-    fun getAll(): List<String> = recentPaths.toList()
+    fun getAllRecent(): List<String> = recentPaths.toList()
 
-    // TODO: prj cũ k tồn tại
-    fun remove(path: String){
+    fun removeRecent(path: String) {
         recentPaths.remove(path)
     }
 
-    private fun loadFromDisk(): MutableList<String> {
+    private fun loadRecentListFromDisk(): MutableList<String> {
         return try {
             if (!recentFile.exists()) return mutableListOf()
             val type = object : TypeToken<List<String>>() {}.type
@@ -45,9 +43,18 @@ object RecentFileStorage {
         }
     }
 
-    private fun saveToDisk() {
+    private fun saveRecentListToDisk() {
         try {
             recentFile.writeText(gson.toJson(recentPaths))
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
+    }
+
+    fun openProject(filePath: String): Boolean {
+        val file = File(filePath)
+        if (!file.exists()) return false
+        currentFile = file
+        addRecent(filePath)
+        return true
     }
 }

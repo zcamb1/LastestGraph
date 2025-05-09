@@ -2,6 +2,7 @@ package com.samsung.iug.ui.manage
 
 import com.intellij.openapi.project.Project
 import com.samsung.iug.ui.iug.IUGMaker
+import com.samsung.iug.ui.login.GuideMainDialog
 import com.samsung.iug.ui.login.LoginDialog
 import javax.swing.SwingUtilities
 
@@ -19,6 +20,20 @@ class LoginScreen : Screen {
             }
         } else {
             loginDialog?.dispose()
+        }
+    }
+}
+
+class GuideMainScreen : Screen {
+    private var guideMainDialog: GuideMainDialog? = null
+    override fun setVisible(visible: Boolean) {
+        if (visible) {
+            guideMainDialog = GuideMainDialog()
+            SwingUtilities.invokeLater {
+                guideMainDialog?.isVisible = true
+            }
+        } else {
+            guideMainDialog?.dispose()
         }
     }
 }

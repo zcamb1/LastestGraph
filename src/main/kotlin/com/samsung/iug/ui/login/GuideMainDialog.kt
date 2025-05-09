@@ -1,5 +1,7 @@
 package com.samsung.iug.ui.login
 
+import com.samsung.iug.ui.manage.ScreenManager
+import com.samsung.iug.utils.FileStorage
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -186,21 +188,27 @@ class GuideMainDialog : JDialog() {
 
     private fun refreshFileList(fileListPanel: JPanel) {
         fileListPanel.removeAll()
-        val files = guideDir.listFiles { _, name -> name.endsWith(".IUG") } ?: return
-        files.sortedBy { it.name }.forEachIndexed { index, file ->
+        FileStorage.getAllRecent().forEachIndexed { index, filePath ->
             val container = JPanel(BorderLayout()).apply {
                 background = if (index % 2 == 0) Color(40, 40, 40) else Color(30, 30, 30)
                 maximumSize = Dimension(Int.MAX_VALUE, 40)
             }
 
-            val label = JLabel(file.name).apply {
+            val fileName = filePath.substringAfterLast("\\")
+
+            val label = JLabel(fileName).apply {
                 foreground = Color.WHITE
                 font = Font("Arial", Font.BOLD, 15)
                 border = EmptyBorder(8, 12, 8, 12)
                 cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
                 addMouseListener(object : MouseAdapter() {
                     override fun mouseClicked(e: MouseEvent?) {
-                        JOptionPane.showMessageDialog(this@GuideMainDialog, "Selected file: ${file.absolutePath}")
+                        if (!FileStorage.openProject(filePath)) {
+                            JOptionPane.showMessageDialog(this@GuideMainDialog, "Project not exists")
+                            FileStorage.removeRecent(filePath)
+                        } else {
+                            ScreenManager.instance.showIUGMakerScreen()
+                        }
                     }
                 })
             }
@@ -224,7 +232,7 @@ class GuideMainDialog : JDialog() {
         file.writeText("This is a new guide.")
         JOptionPane.showMessageDialog(this, "File created: ${file.absolutePath}")
         isVisible = false
-        GuideMainDialog().isVisible = true
+        ScreenManager.instance.showIUGMakerScreen()
     }
 
     private fun openGuide() {
@@ -233,8 +241,7 @@ class GuideMainDialog : JDialog() {
             fileFilter = javax.swing.filechooser.FileNameExtensionFilter("IUG Files", "IUG")
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            val file = chooser.selectedFile
-            JOptionPane.showMessageDialog(this, "File selected: ${file.absolutePath}")
+            ScreenManager.instance.showIUGMakerScreen()
         }
     }
 }

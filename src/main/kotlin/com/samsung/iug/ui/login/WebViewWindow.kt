@@ -7,15 +7,13 @@ package com.samsung.iug.ui.login
 //import javafx.scene.layout.StackPane
 //import javafx.scene.web.WebEngine
 //import javafx.scene.web.WebView
-import com.samsung.iug.ui.login.createTopBar
-import com.samsung.iug.ui.login.GuideMainDialog
+import com.samsung.iug.ui.manage.ScreenManager
 import java.awt.*
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
-import javax.swing.border.MatteBorder
 
 //    can not run on SRV
 //class WebViewDialog : JDialog() {
@@ -158,8 +156,7 @@ class ManualLoginDialog : JDialog() {
                 val pass = String(passField.password)
                 if (user != "ID" && pass != "Password" && user.isNotBlank() && pass.isNotBlank()) {
                     if (user == "admin" && pass == "admin") {
-                        GuideMainDialog().isVisible = true
-                        dispose()
+                        ScreenManager.instance.showGuideMainScreen()
                     } else {
                         JOptionPane.showMessageDialog(this@ManualLoginDialog, "Wrong account.")
                     }
