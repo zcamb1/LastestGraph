@@ -7,14 +7,15 @@ package com.samsung.iug.ui.login
 //import javafx.scene.layout.StackPane
 //import javafx.scene.web.WebEngine
 //import javafx.scene.web.WebView
-import com.samsung.iug.ui.manage.ScreenManager
+import com.samsung.iug.ui.login.createTopBar
+import com.samsung.iug.ui.login.GuideMainDialog
 import java.awt.*
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import javax.swing.border.LineBorder
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
+import javax.swing.border.MatteBorder
 
 //    can not run on SRV
 //class WebViewDialog : JDialog() {
@@ -56,8 +57,7 @@ import javax.swing.border.LineBorder
 //                        Platform.runLater {
 //                            SwingUtilities.invokeLater {
 //                                dispose()
-//                                //TODO next popup
-//
+//                                GuideMainDialog().isVisible = true
 //                            }
 //                        }
 //                    }
@@ -74,8 +74,6 @@ import javax.swing.border.LineBorder
 //    }
 //}
 
-
-
 class ManualLoginDialog : JDialog() {
     init {
         title = "Login with account"
@@ -89,19 +87,15 @@ class ManualLoginDialog : JDialog() {
             override fun paintComponent(g: Graphics) {
                 super.paintComponent(g)
                 val g2 = g as Graphics2D
-                val gradient = GradientPaint(
-                    0f, 0f, Color(200, 200, 200),
-                    0f, height.toFloat(), Color(150, 220, 220)
-                )
+                val gradient = GradientPaint(0f, 0f, Color(200, 200, 200), 0f, height.toFloat(), Color(150, 220, 220))
                 g2.paint = gradient
                 g2.fillRect(0, 0, width, height)
             }
         }
-
-        backgroundPanel.layout = BoxLayout(backgroundPanel, BoxLayout.Y_AXIS)
+        backgroundPanel.layout = BorderLayout()
 
         val topBar = createTopBar(this, showBack = true)
-        backgroundPanel.add(topBar)
+        backgroundPanel.add(topBar, BorderLayout.NORTH)
 
         val contentPanel = JPanel()
         contentPanel.layout = BoxLayout(contentPanel, BoxLayout.Y_AXIS)
@@ -110,86 +104,62 @@ class ManualLoginDialog : JDialog() {
 
         val titleLabel = JLabel("Login with account").apply {
             alignmentX = Component.CENTER_ALIGNMENT
-            font = Font("Arial", Font.BOLD, 26)
+            font = Font("Arial", Font.BOLD, 24)
             foreground = Color(30, 30, 30)
-            border = EmptyBorder(10, 0, 30, 0)
         }
 
-        fun createPlaceholderField(placeholder: String): JTextField {
-            val field = JTextField(placeholder)
-            field.foreground = Color.GRAY
-            field.font = Font("Arial", Font.PLAIN, 16)
-            field.background = Color.WHITE
-            field.border = LineBorder(Color.GRAY)
-            field.maximumSize = Dimension(300, 40)
+        val titlePanel = JPanel()
+        titlePanel.layout = BoxLayout(titlePanel, BoxLayout.Y_AXIS)
+        titlePanel.isOpaque = false
+        titlePanel.alignmentX = Component.CENTER_ALIGNMENT
 
-            field.addFocusListener(object : FocusAdapter() {
-                override fun focusGained(e: FocusEvent) {
-                    if (field.text == placeholder) {
-                        field.text = ""
-                        field.foreground = Color.BLACK
-                    }
-                }
+        titlePanel.add(titleLabel)
 
-                override fun focusLost(e: FocusEvent) {
-                    if (field.text.isBlank()) {
-                        field.text = placeholder
-                        field.foreground = Color.GRAY
-                    }
-                }
-            })
-
-            return field
-        }
-
-        val userField = createPlaceholderField("ID")
-
-        val passField = JPasswordField("Password").apply {
-            foreground = Color.GRAY
-            font = Font("Arial", Font.PLAIN, 16)
-            background = Color.WHITE
-            border = LineBorder(Color.GRAY)
-            maximumSize = Dimension(300, 40)
-            echoChar = 0.toChar()
-
-            addFocusListener(object : FocusAdapter() {
-                override fun focusGained(e: FocusEvent) {
-                    if (String(password) == "Password") {
-                        text = ""
-                        echoChar = '\u2022'
-                        foreground = Color.BLACK
-                    }
-                }
-
-                override fun focusLost(e: FocusEvent) {
-                    if (String(password).isBlank()) {
-                        text = "Password"
-                        echoChar = 0.toChar()
-                        foreground = Color.GRAY
-                    }
-                }
-            })
-        }
-
-        val passwordContainer = JPanel().apply {
-            layout = BorderLayout()
-            background = Color.WHITE
-            maximumSize = Dimension(300, 40)
-            border = LineBorder(Color.GRAY)
-            add(passField, BorderLayout.CENTER)
-        }
-
-        val loginButton = PurpleButton("Login").apply {
+        val underline = JPanel().apply {
+            maximumSize = Dimension(180, 2)
+            preferredSize = Dimension(180, 2)
+            minimumSize = Dimension(180, 2)
+            background = Color.BLACK
             alignmentX = Component.CENTER_ALIGNMENT
+        }
+        titlePanel.add(Box.createRigidArea(Dimension(0, 6)))
+        titlePanel.add(underline)
+        titlePanel.add(Box.createRigidArea(Dimension(0, 50)))
+
+
+        val userField = RoundedTextField("ID")
+        val passField = RoundedPasswordField()
+
+
+        val loginButton = object : JButton("Login") {
+            init {
+                alignmentX = Component.CENTER_ALIGNMENT
+                foreground = Color.WHITE
+                font = Font("Arial", Font.BOLD, 16)
+                preferredSize = Dimension(300, 45)
+                maximumSize = preferredSize
+                minimumSize = preferredSize
+                isFocusPainted = false
+                isBorderPainted = false
+                isContentAreaFilled = false
+            }
+
+            override fun paintComponent(g: Graphics) {
+                val g2 = g as Graphics2D
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+                val gradient = GradientPaint(0f, 0f, Color(120, 80, 160), width.toFloat(), height.toFloat(), Color(180, 120, 255))
+                g2.paint = gradient
+                g2.fillRoundRect(0, 0, width, height, 20, 20)
+                super.paintComponent(g)
+            }
+        }.apply {
             addActionListener {
                 val user = userField.text
                 val pass = String(passField.password)
                 if (user != "ID" && pass != "Password" && user.isNotBlank() && pass.isNotBlank()) {
                     if (user == "admin" && pass == "admin") {
-                        //TODO next popup
-                        JOptionPane.showMessageDialog(this@ManualLoginDialog, "$user login successful!")
-//                        dispose()
-                        ScreenManager.instance.showIUGMakerScreen()
+                        GuideMainDialog().isVisible = true
+                        dispose()
                     } else {
                         JOptionPane.showMessageDialog(this@ManualLoginDialog, "Wrong account.")
                     }
@@ -199,14 +169,104 @@ class ManualLoginDialog : JDialog() {
             }
         }
 
-        contentPanel.add(titleLabel)
-        contentPanel.add(userField)
+        contentPanel.add(Box.createVerticalGlue())
+        contentPanel.add(titlePanel)
         contentPanel.add(Box.createRigidArea(Dimension(0, 20)))
-        contentPanel.add(passwordContainer)
-        contentPanel.add(Box.createRigidArea(Dimension(0, 30)))
+        contentPanel.add(userField)
+        contentPanel.add(Box.createRigidArea(Dimension(0, 15)))
+        contentPanel.add(passField)
+        contentPanel.add(Box.createRigidArea(Dimension(0, 25)))
         contentPanel.add(loginButton)
+        contentPanel.add(Box.createVerticalGlue())
 
-        backgroundPanel.add(contentPanel)
+        backgroundPanel.add(contentPanel, BorderLayout.CENTER)
         contentPane = backgroundPanel
     }
 }
+
+class RoundedTextField(placeholder: String) : JTextField(placeholder) {
+    init {
+        font = Font("Arial", Font.PLAIN, 16)
+        foreground = Color.GRAY
+        border = EmptyBorder(0, 10, 0, 10)
+        preferredSize = Dimension(300, 40)
+        maximumSize = preferredSize
+        isOpaque = false
+
+        addFocusListener(object : FocusAdapter() {
+            override fun focusGained(e: FocusEvent) {
+                if (text == placeholder) {
+                    text = ""
+                    foreground = Color.BLACK
+                }
+            }
+
+            override fun focusLost(e: FocusEvent) {
+                if (text.isBlank()) {
+                    text = placeholder
+                    foreground = Color.GRAY
+                }
+            }
+        })
+    }
+
+    override fun paintComponent(g: Graphics) {
+        val g2 = g as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+        // Background
+        g2.color = Color.WHITE
+        g2.fillRoundRect(0, 0, width, height, 15, 15)
+
+        // Border
+        g2.color = Color(120, 80, 160)
+        g2.drawRoundRect(0, 0, width - 1, height - 1, 15, 15)
+
+        super.paintComponent(g)
+    }
+}
+class RoundedPasswordField : JPasswordField("Password") {
+    init {
+        font = Font("Arial", Font.PLAIN, 16)
+        foreground = Color.GRAY
+        border = EmptyBorder(0, 10, 0, 10)
+        preferredSize = Dimension(300, 40)
+        maximumSize = preferredSize
+        isOpaque = false
+        echoChar = 0.toChar()
+
+        addFocusListener(object : FocusAdapter() {
+            override fun focusGained(e: FocusEvent) {
+                if (String(password) == "Password") {
+                    text = ""
+                    echoChar = '\u2022'
+                    foreground = Color.BLACK
+                }
+            }
+
+            override fun focusLost(e: FocusEvent) {
+                if (String(password).isBlank()) {
+                    text = "Password"
+                    echoChar = 0.toChar()
+                    foreground = Color.GRAY
+                }
+            }
+        })
+    }
+
+    override fun paintComponent(g: Graphics) {
+        val g2 = g as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+        // Background
+        g2.color = Color.WHITE
+        g2.fillRoundRect(0, 0, width, height, 15, 15)
+
+        // Border
+        g2.color = Color(120, 80, 160)
+        g2.drawRoundRect(0, 0, width - 1, height - 1, 15, 15)
+
+        super.paintComponent(g)
+    }
+}
+
