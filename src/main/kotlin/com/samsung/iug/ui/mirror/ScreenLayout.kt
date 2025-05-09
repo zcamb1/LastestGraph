@@ -15,20 +15,25 @@ class ScreenLayout() : JPanel() {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.CENTER_ALIGNMENT
             border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            isOpaque = false
         }
 
-        val screen = JLabel("Màn hình")
+        val screen = ScreenMirror()
 
         val label1 = JLabel().apply {
-            text = "<html><div style='text-align: center;'>Add Step: Select a target</div></html>"
+            text = "<html><div style='width:100%; text-align: center;'>Add Step: Select a target</div></html>"
             font = Font("Arial", Font.BOLD, 14)
             foreground = Color.WHITE
+            alignmentX = Component.CENTER_ALIGNMENT
+            horizontalAlignment = JLabel.CENTER
         }
 
         val label2 = JLabel().apply {
-            text = "<html><div style='text-align: center;'>Select a UI target that Bixby will point to from the <br>highlighted targets</div></html>"
+            text = "<html><div style='width:100%; text-align: center;'>Select a UI target that Bixby will point to from the <br> highlighted targets</div></html>"
             font = Font("Arial", Font.BOLD , 12)
             foreground = Color.GRAY
+            alignmentX = Component.CENTER_ALIGNMENT
+            horizontalAlignment = JLabel.CENTER
         }
 
         add(screen)

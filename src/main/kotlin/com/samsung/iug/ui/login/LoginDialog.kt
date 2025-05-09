@@ -1,5 +1,6 @@
 package com.samsung.iug.ui.login
 
+import com.samsung.iug.ui.factory.IUGFactory
 import java.awt.*
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
@@ -88,10 +89,12 @@ class LoginDialog : JDialog() {
         val ssoButton = PurpleButton("Log In with SSO").apply {
             alignmentX = Component.CENTER_ALIGNMENT
             addActionListener {
-                JOptionPane.showMessageDialog(this@LoginDialog, "Login successful!")
+//                JOptionPane.showMessageDialog(this@LoginDialog, "Login successful!")
+
 //    can not run on SRV
-//                dispose()
+                dispose()
 //                WebViewDialog().isVisible = true
+                IUGFactory()
             }
         }
 

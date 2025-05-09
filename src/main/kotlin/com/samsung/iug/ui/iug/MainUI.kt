@@ -3,12 +3,14 @@ package com.samsung.iug.ui.iug
 import com.intellij.util.ui.JBUI
 import com.samsung.iug.ui.custom.CircleIconButton
 import com.samsung.iug.ui.custom.RoundedPanel
+import com.samsung.iug.ui.graph.GraphUI
 import com.samsung.iug.utils.ImageHelper
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
 class MainUI(private val screenWidth: Int, private val screenHeight: Int, private val onClose: () -> Unit) : JPanel() {
+    private val graphPanel = GraphUI()
     init {
         preferredSize = Dimension(Toolkit.getDefaultToolkit().screenSize)
         border = EmptyBorder((screenHeight * 0.05).toInt(), 0, (screenHeight * 0.05).toInt(), 0)
@@ -51,15 +53,10 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
 
     private fun createMainLayout(): JPanel {
         return JPanel().apply {
-            preferredSize = Dimension(screenWidth, 900)
+            preferredSize = Dimension(screenWidth, screenHeight)
             maximumSize = preferredSize
             layout = OverlayLayout(this)
             isOpaque = false
-
-            val graphPanel = JPanel().apply {
-                add(JLabel("Graph ở đây nha"))
-                isOpaque = false
-            }
 
             val toolBars = createToolBars()
 
@@ -84,6 +81,10 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
                 val buttonZoomOut = createToolBarButton("/images/icon_zoom_out.png")
                 val buttonZoomIn = createToolBarButton("/images/icon_zoom_in.png")
                 val buttonPan = createToolBarButton("/images/icon_pan.png")
+
+                buttonAdd.addActionListener {
+                    graphPanel.addNode()
+                }
 
                 add(buttonAdd)
                 add(buttonZoomOut)

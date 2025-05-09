@@ -1,4 +1,4 @@
-package com.samsung.iug.factory
+package com.samsung.iug.ui.factory
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
