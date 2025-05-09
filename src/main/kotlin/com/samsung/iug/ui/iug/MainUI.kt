@@ -4,13 +4,19 @@ import com.intellij.util.ui.JBUI
 import com.samsung.iug.ui.custom.CircleIconButton
 import com.samsung.iug.ui.custom.RoundedPanel
 import com.samsung.iug.ui.graph.GraphUI
+import com.samsung.iug.ui.preview.PreviewPanel
 import com.samsung.iug.utils.ImageHelper
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
 class MainUI(private val screenWidth: Int, private val screenHeight: Int, private val onClose: () -> Unit) : JPanel() {
+
+    private lateinit var buttonPreview: JButton
+    private var previewDialog: JDialog? = null
+    private var isPreviewVisible = false
     private val graphPanel = GraphUI()
+
     init {
         preferredSize = Dimension(Toolkit.getDefaultToolkit().screenSize)
         border = EmptyBorder((screenHeight * 0.05).toInt(), 0, (screenHeight * 0.05).toInt(), 0)
@@ -92,7 +98,11 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
                 add(buttonPan)
             }
 
-            val buttonPreview = createToolBarCircleButton("/images/icon_play.png")
+            buttonPreview = createToolBarCircleButton("/images/icon_play.png", highlighted = false).apply {
+                addActionListener {
+                    togglePreview()
+                }
+            }
             val buttonMirror = createToolBarCircleButton("/images/icon_flip.png")
             val buttonConsole = createToolBarCircleButton("/images/icon_terminal.png")
             val buttonMore = createToolBarCircleButton("/images/icon_more.png")
@@ -105,12 +115,42 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
         }
     }
 
-    private fun createWindowButton(pathIcon: String): JButton {
-        return createCircleButton(pathIcon, 22, Color.WHITE, 1f)
+    private fun togglePreview() {
+        if (isPreviewVisible) {
+            previewDialog?.dispose()
+            isPreviewVisible = false
+        } else {
+            previewDialog = JDialog(SwingUtilities.getWindowAncestor(this), "", Dialog.ModalityType.MODELESS).apply {
+                contentPane = PreviewPanel.panel
+                defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
+                pack()
+                setLocationRelativeTo(null)
+                isVisible = true
+
+                addWindowListener(object : java.awt.event.WindowAdapter() {
+                    override fun windowClosed(e: java.awt.event.WindowEvent?) {
+                        isPreviewVisible = false
+                        refreshPreviewButton()
+                    }
+                })
+            }
+            isPreviewVisible = true
+        }
+        refreshPreviewButton()
     }
 
-    private fun createToolBarCircleButton(pathIcon: String): JButton {
-        return createCircleButton(pathIcon, 35, Color.GRAY, 2f)
+    private fun refreshPreviewButton() {
+        updateCircleButtonHighlight(buttonPreview, "/images/icon_play.png", isPreviewVisible)
+    }
+
+    private fun createWindowButton(pathIcon: String): JButton {
+        return createCircleButton(pathIcon, 22, Color.WHITE, 1f, Color.DARK_GRAY)
+    }
+
+    private fun createToolBarCircleButton(pathIcon: String, highlighted: Boolean = false): JButton {
+        val bgColor = if (highlighted) Color(0x36498C) else Color.DARK_GRAY
+        val borderColor = if (highlighted) Color(0x1E90FF) else Color.GRAY
+        return createCircleButton(pathIcon, 35, borderColor, 2f, bgColor)
     }
 
     private fun createToolBarButton(pathIcon: String, size: Int = 30): JButton {
@@ -118,7 +158,7 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
         val rawIcon = ImageIcon(iconUrl)
         val newIcon = ImageHelper.recolorImageIcon(rawIcon, Color.WHITE)
         val icon = ImageHelper.resizeIcon(newIcon, size, size)
-        val button = JButton(icon).apply {
+        return JButton(icon).apply {
             isBorderPainted = false
             isContentAreaFilled = false
             isFocusPainted = false
@@ -126,25 +166,46 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
             preferredSize = Dimension(size + 10, size + 10)
             maximumSize = preferredSize
         }
-
-        return button
     }
 
-
-    private fun createCircleButton(pathIcon: String, size: Int, borderColor: Color, strokeWidth: Float): JButton {
+    private fun createCircleButton(
+        pathIcon: String,
+        size: Int,
+        borderColor: Color,
+        strokeWidth: Float,
+        backgroundColor: Color
+    ): JButton {
         val iconUrl = javaClass.getResource(pathIcon)
         val rawIcon = ImageIcon(iconUrl)
         val newIcon = ImageHelper.recolorImageIcon(rawIcon, Color.WHITE)
         val iconImage = ImageHelper.resizeIcon(newIcon, size / 3 * 2, size / 3 * 2)
 
-        val circleIcon = CircleIconButton(size, Color.DARK_GRAY, borderColor, strokeWidth, iconImage)
-        val button = JButton(circleIcon).apply {
+        val circleIcon = CircleIconButton(size, backgroundColor, borderColor, strokeWidth, iconImage)
+        return JButton(circleIcon).apply {
             isFocusPainted = false
             isContentAreaFilled = false
             isBorderPainted = false
             preferredSize = Dimension(size + 5, size + 5)
             maximumSize = preferredSize
         }
-        return button
+    }
+
+    private fun updateCircleButtonHighlight(
+        button: JButton,
+        pathIcon: String,
+        highlighted: Boolean,
+        size: Int = 35
+    ) {
+        val bgColor = if (highlighted) Color(0x36498C) else Color.DARK_GRAY
+        val borderColor = if (highlighted) Color(0x1E90FF) else Color.GRAY
+
+        val iconUrl = javaClass.getResource(pathIcon)
+        val rawIcon = ImageIcon(iconUrl)
+        val recoloredIcon = ImageHelper.recolorImageIcon(rawIcon, Color.WHITE)
+        val iconImage = ImageHelper.resizeIcon(recoloredIcon, size / 3 * 2, size / 3 * 2)
+
+        val circleIcon = CircleIconButton(size, bgColor, borderColor, 2f, iconImage)
+        button.icon = circleIcon
+        button.repaint()
     }
 }
