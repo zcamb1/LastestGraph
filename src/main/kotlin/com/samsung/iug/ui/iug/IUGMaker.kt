@@ -4,7 +4,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.WindowManager
 import java.awt.*
 import javax.swing.JComponent
+import javax.swing.JFrame
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 fun IUGMaker(project: Project) {
     val frame = WindowManager.getInstance().getFrame(project) ?: return
@@ -23,8 +25,11 @@ fun IUGMaker(project: Project) {
             isOpaque = false
             bounds = Rectangle(0, 0, screenWidth, screenHeight)
 
-            val panel = MainUI((screenWidth * 0.9).toInt(), screenHeight) {
-                frame.dispose()
+            val panel = MainUI((screenWidth * 0.9).toInt(), (screenHeight * 0.9).toInt()) {
+                val topFrame = SwingUtilities.getWindowAncestor(this)
+                if (topFrame is JFrame) {
+                    topFrame.dispose()
+                }
             }
             panel.setBounds(regionX, regionY, regionWidth, regionHeight)
             panel.isOpaque = false

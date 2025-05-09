@@ -3,7 +3,7 @@ package com.samsung.iug.ui.custom
 import java.awt.*
 import javax.swing.*
 
-class RoundedPanel(
+open class RoundedPanel(
     private val radius: Int = 20,
     private val bgColor: Color = Color.WHITE
 ) : JPanel() {
