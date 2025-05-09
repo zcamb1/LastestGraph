@@ -7,12 +7,13 @@ package com.samsung.iug.ui.login
 //import javafx.scene.layout.StackPane
 //import javafx.scene.web.WebEngine
 //import javafx.scene.web.WebView
+import com.samsung.iug.ui.manage.ScreenManager
 import java.awt.*
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
 import javax.swing.border.LineBorder
 
 //    can not run on SRV
@@ -188,6 +189,7 @@ class ManualLoginDialog : JDialog() {
                         //TODO next popup
                         JOptionPane.showMessageDialog(this@ManualLoginDialog, "$user login successful!")
 //                        dispose()
+                        ScreenManager.instance.showIUGMakerScreen()
                     } else {
                         JOptionPane.showMessageDialog(this@ManualLoginDialog, "Wrong account.")
                     }
