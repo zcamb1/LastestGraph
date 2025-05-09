@@ -6,7 +6,7 @@ import javax.swing.*
 class CircleIconButton(
     private val diameter: Int,
     private val background: Color,
-    private val borderColor: Color,
+    private val borderColor: Color? = null,
     private val strokeWidth: Float,
     private val innerIcon: Icon? = null
 ) : Icon {
@@ -21,7 +21,9 @@ class CircleIconButton(
         g2.color = background
         g2.fillOval(x, y, diameter, diameter)
 
-        g2.color = borderColor
+        if (borderColor != null) {
+            g2.color = borderColor
+        }
         g2.stroke = BasicStroke(strokeWidth)
         g2.drawOval(x, y, diameter - 1, diameter - 1)
 

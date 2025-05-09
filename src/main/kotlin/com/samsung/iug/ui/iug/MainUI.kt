@@ -6,10 +6,12 @@ import com.samsung.iug.ui.custom.RoundedPanel
 import com.samsung.iug.utils.ImageHelper
 import java.awt.*
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 
-class MainUI(private val onClose: () -> Unit) : JPanel() {
+class MainUI(private val screenWidth: Int, private val screenHeight: Int, private val onClose: () -> Unit) : JPanel() {
     init {
         preferredSize = Dimension(Toolkit.getDefaultToolkit().screenSize)
+        border = EmptyBorder((screenHeight * 0.05).toInt(), 0, (screenHeight * 0.05).toInt(), 0)
 
         val topBar = createTopBar()
         val mainPanel = createMainLayout()
@@ -43,20 +45,20 @@ class MainUI(private val onClose: () -> Unit) : JPanel() {
             add(titleLabel, BorderLayout.WEST)
             add(windowPanel, BorderLayout.EAST)
             isOpaque = false
-            preferredSize = Dimension(1350, 50)
+            preferredSize = Dimension((screenWidth * 0.9).toInt(), 50)
         }
     }
 
     private fun createMainLayout(): JPanel {
         return JPanel().apply {
-            preferredSize = Dimension(1450, 900)
+            preferredSize = Dimension(screenWidth, 900)
             maximumSize = preferredSize
             layout = OverlayLayout(this)
             isOpaque = false
 
             val graphPanel = JPanel().apply {
                 add(JLabel("Graph ở đây nha"))
-                isOpaque = false        // Background Transparent
+                isOpaque = false
             }
 
             val toolBars = createToolBars()
@@ -72,9 +74,9 @@ class MainUI(private val onClose: () -> Unit) : JPanel() {
             maximumSize = preferredSize
             isOpaque = false
             alignmentX = 1.0f
-            alignmentY = 1.0f
+            alignmentY = 0.3f
 
-            val panelGroup = RoundedPanel(20, Color.DARK_GRAY).apply {
+            val panelGroup = RoundedPanel(60, Color.DARK_GRAY).apply {
                 preferredSize = Dimension(60, 200)
                 maximumSize = preferredSize
 
@@ -89,10 +91,10 @@ class MainUI(private val onClose: () -> Unit) : JPanel() {
                 add(buttonPan)
             }
 
-            val buttonPreview = createToolBarButton("/images/icon_play.png")
-            val buttonMirror = createToolBarButton("/images/icon_flip.png")
-            val buttonConsole = createToolBarButton("/images/icon_terminal.png")
-            val buttonMore = createToolBarButton("/images/icon_more.png")
+            val buttonPreview = createToolBarCircleButton("/images/icon_play.png")
+            val buttonMirror = createToolBarCircleButton("/images/icon_flip.png")
+            val buttonConsole = createToolBarCircleButton("/images/icon_terminal.png")
+            val buttonMore = createToolBarCircleButton("/images/icon_more.png")
 
             add(panelGroup)
             add(buttonPreview)
@@ -106,9 +108,27 @@ class MainUI(private val onClose: () -> Unit) : JPanel() {
         return createCircleButton(pathIcon, 22, Color.WHITE, 1f)
     }
 
-    private fun createToolBarButton(pathIcon: String): JButton {
+    private fun createToolBarCircleButton(pathIcon: String): JButton {
         return createCircleButton(pathIcon, 35, Color.GRAY, 2f)
     }
+
+    private fun createToolBarButton(pathIcon: String, size: Int = 30): JButton {
+        val iconUrl = javaClass.getResource(pathIcon)
+        val rawIcon = ImageIcon(iconUrl)
+        val newIcon = ImageHelper.recolorImageIcon(rawIcon, Color.WHITE)
+        val icon = ImageHelper.resizeIcon(newIcon, size, size)
+        val button = JButton(icon).apply {
+            isBorderPainted = false
+            isContentAreaFilled = false
+            isFocusPainted = false
+            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+            preferredSize = Dimension(size + 10, size + 10)
+            maximumSize = preferredSize
+        }
+
+        return button
+    }
+
 
     private fun createCircleButton(pathIcon: String, size: Int, borderColor: Color, strokeWidth: Float): JButton {
         val iconUrl = javaClass.getResource(pathIcon)

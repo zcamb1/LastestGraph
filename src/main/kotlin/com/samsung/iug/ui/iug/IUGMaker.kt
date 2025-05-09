@@ -23,14 +23,14 @@ fun IUGMaker(project: Project) {
             isOpaque = false
             bounds = Rectangle(0, 0, screenWidth, screenHeight)
 
-            val panel = MainUI {
+            val panel = MainUI(screenWidth, screenHeight) {
                 frame.dispose()
             }
             panel.setBounds(regionX, regionY, regionWidth, regionHeight)
             panel.isOpaque = false
 
-            this.layout = null
-            this.add(panel)
+            this.layout = BorderLayout()
+            this.add(panel, BorderLayout.CENTER)
         }
 
         override fun paintComponent(g: Graphics?) {
