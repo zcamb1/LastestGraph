@@ -1,7 +1,7 @@
 package com.samsung.iug.log
 
-import com.samsung.iug.model.LogEntry
-import com.samsung.iug.model.LogLevel
+import com.samsung.iug.log.model.LogEntry
+import com.samsung.iug.log.model.LogLevel
 import com.samsung.iug.ui.log.LogPanel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
