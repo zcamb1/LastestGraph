@@ -60,7 +60,7 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
             add(titleLabel, BorderLayout.WEST)
             add(windowPanel, BorderLayout.EAST)
             isOpaque = false
-            preferredSize = Dimension(screenWidth, 50)
+            preferredSize = Dimension((screenWidth * 0.9).toInt(), 50)
         }
     }
 
