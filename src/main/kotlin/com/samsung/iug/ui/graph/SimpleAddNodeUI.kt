@@ -233,12 +233,33 @@ class SimpleAddNodeUI : JPanel() {
                 val nodeHeight = GraphPanel.NODE_HEIGHT
                 val prevGeom = graph.getCellGeometry(previousCell)
 
-                // Default position - to the right of previous node
+                // Try to find a "+" button connected to the previous cell
+                val addButton = findAddButtonForNode(graph, previousCell)
+
+                // Default position (if no add button is found)
                 var newX = prevGeom.x + prevGeom.width + AddButtonConnector.HORIZONTAL_SPACING / 2
                 var newY = prevGeom.y
 
-                // If the previous node already has children, adjust X position
-                if (childCells.isNotEmpty()) {
+                // If we found an add button connected to the previous node, use its position
+                if (addButton != null) {
+                    val buttonGeometry = graph.getCellGeometry(addButton)
+
+                    // Place the new node at the position of the button
+                    // Adjust position to center the node at the button's position
+                    newX = buttonGeometry.x - (nodeWidth / 2) + (AddButtonConnector.BUTTON_SIZE / 2)
+                    newY = buttonGeometry.y - (nodeHeight / 2) + (AddButtonConnector.BUTTON_SIZE / 2)
+
+                    // First, remove all edges connected to the add button
+                    val edges = graph.getEdges(addButton)
+                    if (edges != null && edges.isNotEmpty()) {
+                        graph.removeCells(edges)
+                    }
+
+                    // Then remove the add button itself
+                    graph.removeCells(arrayOf(addButton))
+                }
+                // If no add button is found, use the default positioning logic
+                else if (childCells.isNotEmpty()) {
                     // Use the same X position as the first child
                     val firstChildGeom = graph.getCellGeometry(childCells.first())
                     newX = firstChildGeom.x
@@ -252,6 +273,12 @@ class SimpleAddNodeUI : JPanel() {
                         val bottomChildGeom = graph.getCellGeometry(bottomMostChild)
                         newY = bottomChildGeom.y + bottomChildGeom.height + VERTICAL_SPACING
                     }
+                }
+
+                // Modification: Always keep Y position same as previous node
+                // This matches the legacy add button behavior
+                if (addButton == null) {
+                    newY = prevGeom.y
                 }
 
                 // Get all nodes in the graph to check for potential overlaps
@@ -386,14 +413,12 @@ class SimpleAddNodeUI : JPanel() {
                     val nodeWidth = GraphPanel.NODE_WIDTH
                     val nodeHeight = GraphPanel.NODE_HEIGHT
 
-                    // Calculate better position for the new node to avoid overlap
-                    // Place it to the right of the source node with proper spacing
-                    val newNodeX = sourceNodeGeometry.x + nodeWidth + AddButtonConnector.HORIZONTAL_SPACING / 2
+                    // Place the new node at the position of the button that was clicked
+                    // Adjust position to center the node at the button's position
+                    val newNodeX = buttonGeometry.x - (nodeWidth / 2) + (AddButtonConnector.BUTTON_SIZE / 2)
+                    val newNodeY = buttonGeometry.y - (nodeHeight / 2) + (AddButtonConnector.BUTTON_SIZE / 2)
 
-                    // Keep it at the same Y level as the source node
-                    val newNodeY = sourceNodeGeometry.y
-
-                    // Create a new node at the calculated position
+                    // Create a new node at the button's position
                     val newNode = graph.insertVertex(
                         graph.defaultParent, null, NodeEditDialog.createStepNodeHtml(guideContent, stepId),
                         newNodeX, newNodeY, nodeWidth, nodeHeight, "stepNode"
@@ -486,5 +511,25 @@ class SimpleAddNodeUI : JPanel() {
 
         // The second captured group should be the Step ID
         return match?.groupValues?.getOrNull(2)?.trim() ?: ""
+    }
+
+    /**
+     * Find an add button connected to a node
+     */
+    private fun findAddButtonForNode(graph: mxGraph, node: mxCell): mxCell? {
+        // Get all outgoing edges from the node
+        val outgoingEdges = graph.getOutgoingEdges(node)
+
+        // Find any edge that connects to an add button
+        for (edge in outgoingEdges) {
+            val targetCell = (edge as mxCell).target as? mxCell
+
+            // Check if the target is an add button
+            if (targetCell != null && AddButtonConnector.isAddButton(graph, targetCell)) {
+                return targetCell
+            }
+        }
+
+        return null
     }
 } 
