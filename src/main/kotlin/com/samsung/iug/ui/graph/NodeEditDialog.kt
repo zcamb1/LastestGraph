@@ -54,7 +54,7 @@ object NodeEditDialog {
 
         val scrollPane = JScrollPane(textArea)
         scrollPane.border = BorderFactory.createLineBorder(Color(100, 100, 100), 1, true)
-        scrollPane.preferredSize = Dimension(240, 70)
+        scrollPane.preferredSize = Dimension(350, 100)
 
         // Create step ID field for step nodes
         val stepIdField = JTextField(stepId)
@@ -64,7 +64,7 @@ object NodeEditDialog {
         stepIdField.font = Font("Arial", Font.PLAIN, 13)
         stepIdField.margin = Insets(8, 10, 8, 10)
         stepIdField.border = BorderFactory.createLineBorder(Color(100, 100, 100), 1, true)
-        stepIdField.preferredSize = Dimension(240, 30)
+        stepIdField.preferredSize = Dimension(350, 30)
 
         val buttonPanel = JPanel(FlowLayout(FlowLayout.CENTER))
         buttonPanel.isOpaque = false
@@ -258,7 +258,7 @@ object NodeEditDialog {
      */
     fun createQueryNodeHtml(text: String): String {
         return """
-          <table style="width:150px; color:#fff; font-family:Arial; font-size:11px;margin-top:25px;padding-left:8px">
+          <table style="width:250px; color:#fff; font-family:Arial; font-size:11px;margin-top:25px;padding-left:8px">
                 <tr><td>${text.escapeHtml()}</td></tr> 
                 <tr><td style="font-weight:bold; opacity:0.7;">User Query</td></tr>
             </table>
@@ -270,7 +270,7 @@ object NodeEditDialog {
      */
     fun createStepNodeHtml(guideText: String, stepId: String): String {
         return """
-          <table style="width:150px; color:#fff; font-family:Arial; font-size:11px;margin-top:25px;padding-left:8px">
+          <table style="width:250px; color:#fff; font-family:Arial; font-size:11px;margin-top:25px;padding-left:8px">
                 <tr><td>${guideText.escapeHtml()}</td></tr> 
                 <tr><td style="font-weight:bold; opacity:0.7;">${stepId.escapeHtml()}</td></tr>
             </table>
@@ -282,7 +282,7 @@ object NodeEditDialog {
      */
     fun createNodeHtml(text: String, subtitle: String): String {
         return """
-          <table style="width:150px; color:#fff; font-family:Arial; font-size:9px;margin-top:30px;">
+          <table style="width:250px; color:#fff; font-family:Arial; font-size:9px;margin-top:30px;">
                   <tr><td>${text.escapeHtml()}</td></tr>
                   <tr><td style="font-weight:bold; opacity:0.7;">${subtitle.escapeHtml()}</td></tr>
                 </table>
