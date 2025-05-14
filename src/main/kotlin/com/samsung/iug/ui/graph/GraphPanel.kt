@@ -366,6 +366,8 @@ object GraphPanel : JPanel() {
 
             // Determine if this is a step node (green border) or query node (purple border)
             val isStepNode = cell.style.contains("stepNode")
+            val isUserQueryNode = cell.style.contains("userQueryNode") || 
+                                (cell.value?.toString()?.contains("User Query") == true)
 
             // Create edit dot
             createEditDot(cell, x, y, isStepNode)
@@ -373,8 +375,10 @@ object GraphPanel : JPanel() {
             // Create copy dot
             createCopyDot(cell, x + 35, y, isStepNode)
 
-            // Create trash bin icon to the right of the other dots
-            createTrashIcon(cell, x + 70, y, isStepNode)
+            // Create trash bin icon to the right of the other dots, but only for step nodes (not user query nodes)
+            if (!isUserQueryNode) {
+                createTrashIcon(cell, x + 70, y, isStepNode)
+            }
         } finally {
             graph.model.endUpdate()
         }
@@ -389,15 +393,15 @@ object GraphPanel : JPanel() {
 
         // Create HTML content with trash bin icon
         val trashIconHtml = """
-            <div style="display:flex;justify-content:center;align-items:center;width:100%;height:100%;padding-bottom:5px;">
-                <span style="font-size:16px;color:${iconColor};">🗑️</span>
+            <div style="display:flex;justify-content:center;align-items:center;width:100%;height:100%;padding-bottom:10px;">
+                <span style="font-size:13px;color:${iconColor};">🗑️</span>
             </div>
         """.trimIndent()
 
         // Create trash dot
         val trashDot = graph.insertVertex(
             parent, null, trashIconHtml,
-            x, y, 20.0, 20.0, trashDotStyle + ";html=1"
+            x, y, 25.0, 25.0, trashDotStyle + ";html=1"
         )
 
         dotCells.add(trashDot as mxCell)
@@ -420,7 +424,7 @@ object GraphPanel : JPanel() {
         // Apply HTML style directly in the style string
         val editDot = graph.insertVertex(
             parent, null, editIconHtml,
-            x + 5, y, 20.0, 20.0, editDotStyle + ";html=1"
+            x + 5, y, 25.0, 25.0, editDotStyle + ";html=1"
         )
 
         dotCells.add(editDot as mxCell)
@@ -443,7 +447,7 @@ object GraphPanel : JPanel() {
         // Create copy dot
         val copyDot = graph.insertVertex(
             parent, null, copyIconHtml,
-            x, y, 20.0, 20.0, copyDotStyle + ";html=1"
+            x, y, 25.0, 25.0, copyDotStyle + ";html=1"
         )
 
         dotCells.add(copyDot as mxCell)

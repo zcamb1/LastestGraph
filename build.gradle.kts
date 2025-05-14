@@ -4,19 +4,12 @@ plugins {
     id("org.jetbrains.intellij") version "1.17.4"
 }
 
-group = "com.samsung"
-version = "0.2"
+group = "com.example"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    localPath.set("D:\\Install\\Android\\Android Studio 2023")
-    plugins.set(listOf("android"))
+    google()
 }
 
 dependencies {
@@ -27,14 +20,20 @@ dependencies {
     implementation("org.bytedeco:ffmpeg:5.1.2-1.5.8")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.tinyjee.jgraphx:jgraphx:3.4.1.3")
-//    can not run on SRV
-//    implementation("org.openjfx:javafx-controls:17")
-//    implementation("org.openjfx:javafx-web:17")
-//    implementation("org.openjfx:javafx-swing:17")
 }
 
-tasks.processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+// Configure Gradle IntelliJ Plugin
+// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
+intellij {
+    version.set("2023.2.6")
+    type.set("IC") // Target IDE Platform
+
+    plugins.set(listOf(
+        "org.jetbrains.android",      // Main Android plugin
+        "android",                    // Android framework support
+        "org.jetbrains.kotlin",       // Kotlin support
+        "com.intellij.gradle"         // Gradle integration
+    ))
 }
 
 tasks {
@@ -48,7 +47,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232")
+        sinceBuild.set("222")
         untilBuild.set("243.*")
     }
 
@@ -60,21 +59,5 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
-    }
-
-    runIde {
-        ideDir.set(file("D:\\Install\\Android\\Android Studio 2023"))
-    }
-
-    instrumentCode {
-        enabled = false
-    }
-
-    instrumentTestCode {
-        enabled = false
-    }
-
-    buildSearchableOptions{
-        enabled = false
     }
 }

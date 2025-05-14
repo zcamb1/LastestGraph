@@ -22,8 +22,6 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.android</depends>
-    <depends>com.intellij.modules.androidstudio</depends>
-
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">

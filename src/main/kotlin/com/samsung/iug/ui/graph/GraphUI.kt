@@ -50,7 +50,7 @@ object GraphUI: JPanel(BorderLayout()) {
         simpleAddNodePanel.isVisible = false // Temporary UI for adding nodes
         background = Color(0,0,0,0)
         add(layeredPane, BorderLayout.CENTER)
-        graphPanel.setBounds(0, 200, 1920, 1080)
+        graphPanel.setBounds(0, 0, 1920, 1080)
         graphPanel.repaint()
         graphPanel.revalidate()
         layeredPane.repaint()
