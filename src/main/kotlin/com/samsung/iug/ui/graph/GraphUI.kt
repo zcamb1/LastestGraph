@@ -169,4 +169,20 @@ object GraphUI: JPanel(BorderLayout()) {
             logBar.isVisible = false
         }
     }
+
+    fun zoomIn() {
+        graphPanel.zoomIn()
+    }
+    fun zoomOut() {
+        graphPanel.zoomOut()
+    }
+
+    /**
+     * Enable or disable panning mode
+     * 
+     * @param enabled True to enable panning, false to disable
+     */
+    fun setPanningMode(enabled: Boolean) {
+        graphPanel.setPanningMode(enabled)
+    }
 }

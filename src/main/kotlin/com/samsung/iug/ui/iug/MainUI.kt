@@ -112,6 +112,23 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
                 graphPanel.addNode()
             }
 
+            buttonZoomIn.addActionListener {
+                graphPanel.zoomIn()
+            }
+            buttonZoomOut.addActionListener {
+                graphPanel.zoomOut()
+            }
+            
+            var isPanningEnabled = false
+            buttonPan.addActionListener {
+                isPanningEnabled = !isPanningEnabled
+                graphPanel.setPanningMode(isPanningEnabled)
+                
+                if (buttonPan is CircleIconButton) {
+                    buttonPan.refreshColorSelected(isPanningEnabled)
+                }
+            }
+
             val panelGroup = RoundedPanel(60, Color.DARK_GRAY).apply {
                 preferredSize = Dimension(60, 200)
                 maximumSize = preferredSize
@@ -192,4 +209,5 @@ class MainUI(private val screenWidth: Int, private val screenHeight: Int, privat
             2f
         )
     }
+
 }

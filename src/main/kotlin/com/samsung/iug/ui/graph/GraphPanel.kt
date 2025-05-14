@@ -32,6 +32,10 @@ object GraphPanel : JPanel() {
 
     // Track action dots
     private var dotCells = mutableListOf<mxCell>()
+    
+    // Panning implementation properties
+    private var isPanningEnabled = false
+    private var lastPanPoint: Point? = null
 
     // Style constants - moved outside companion object since object can't have companion
     const val NODE_WIDTH = 280.0
@@ -269,11 +273,46 @@ object GraphPanel : JPanel() {
             override fun mouseMoved(e: MouseEvent) {
                 handleNodeHover(e)
             }
+            
+            override fun mouseDragged(e: MouseEvent) {
+                // Handle panning if enabled
+                if (isPanningEnabled && SwingUtilities.isLeftMouseButton(e) && lastPanPoint != null) {
+                    val dx = e.point.x - lastPanPoint!!.x
+                    val dy = e.point.y - lastPanPoint!!.y
+                    
+                    // Move all cells
+                    moveAllCells(dx, dy)
+                    
+                    lastPanPoint = e.point
+                    e.consume()
+                }
+            }
         })
 
         // Mouse listener for clicks and for clearing dots when mouse exits
         graphComponent.graphControl.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                // Handle panning start if enabled
+                if (isPanningEnabled && SwingUtilities.isLeftMouseButton(e)) {
+                    lastPanPoint = e.point
+                    e.consume()
+                }
+            }
+            
+            override fun mouseReleased(e: MouseEvent) {
+                // Clear panning state
+                if (isPanningEnabled && SwingUtilities.isLeftMouseButton(e)) {
+                    lastPanPoint = null
+                    e.consume()
+                }
+            }
+            
             override fun mouseClicked(e: MouseEvent) {
+                // Don't handle clicks if we're in panning mode
+                if (isPanningEnabled) {
+                    return
+                }
+                
                 if (e.clickCount == 2) {
                     val cell = graphComponent.getCellAt(e.x, e.y) as? mxCell
                     if (cell != null && !cell.isEdge && !AddButtonConnector.isAddButton(graph, cell)) {
@@ -632,6 +671,13 @@ object GraphPanel : JPanel() {
         return cell
     }
 
+    fun zoomIn() {
+        graphComponent.zoomIn()
+    }
+    fun zoomOut() {
+        graphComponent.zoomOut()
+    }
+
     /**
      * Add a new node to the graph with add button connected to it
      */
@@ -668,5 +714,58 @@ object GraphPanel : JPanel() {
         val parentComponent = parent as? Component
         val parentSize = parentComponent?.getSize() ?: super.getPreferredSize()
         return Dimension(parentSize.width, parentSize.height)
+    }
+    
+    /**
+     * Toggle panning mode on/off
+     */
+    fun setPanningMode(enabled: Boolean) {
+        // Update panning state
+        isPanningEnabled = enabled
+        
+        // Update cursor to indicate mode
+        if (enabled) {
+            graphComponent.graphControl.cursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
+        } else {
+            graphComponent.graphControl.cursor = Cursor.getDefaultCursor()
+        }
+    }
+
+    /**
+     * Move all cells in the graph by dx, dy
+     */
+    private fun moveAllCells(dx: Int, dy: Int) {
+        graph.model.beginUpdate()
+        try {
+            val parent = graph.defaultParent
+            val cells = graph.getChildCells(parent, true, true) // Get both vertices and edges
+            
+            for (cell in cells) {
+                val geom = graph.getCellGeometry(cell)
+                if (geom != null) {
+                    val newGeom = geom.clone() as com.mxgraph.model.mxGeometry
+                    
+                    // Update position based on cell type
+                    if (cell is mxCell && !cell.isEdge) {
+                        newGeom.x = geom.x + dx
+                        newGeom.y = geom.y + dy
+                    } else if (cell is mxCell && cell.isEdge) {
+                        // Move edge control points if any
+                        val points = geom.points
+                        if (points != null) {
+                            val newPoints = mutableListOf<com.mxgraph.util.mxPoint>()
+                            for (point in points) {
+                                newPoints.add(com.mxgraph.util.mxPoint(point.x + dx, point.y + dy))
+                            }
+                            newGeom.points = newPoints
+                        }
+                    }
+                    
+                    graph.model.setGeometry(cell, newGeom)
+                }
+            }
+        } finally {
+            graph.model.endUpdate()
+        }
     }
 }
