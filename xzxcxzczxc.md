@@ -1,16 +1,7 @@
-AI Autopilot (Agent Mode) – Give it a task, the AI handles every step end-to-end for you.
+Price: At US $20 per month (US $16 if paid yearly), Pro removes every paywall the free tier hits in days; the small fee is offset by even a single hour of saved work.
 
-Instant Smart Suggestions – Real-time, multi-line code completions that cut keystrokes and typos.
+Quota: Pro gives unlimited completions plus 500 priority (fast-queue) requests each month—any extra queries still run in the standard queue, so you’re never blocked.
 
-Project-Aware Chat Assistant – Ask anything about your codebase and get instant answers, fixes, or explanations.
+Security: Pro (and Business) add Privacy Mode and admin controls that keep your code private, something the free Hobby plan lacks.
 
-Plain-English → Code / Command – Describe what you need; AI writes the code or terminal command automatically.
-
-
-Cursor AI is an AI-powered IDE (built on Visual Studio Code) that accelerates every stage of development with smart code completions, project-aware chat assistance, and end-to-end task automation.
-
-
-
-
-
-
+Bottom line: If you rely on AI daily, Pro is the smartest spend—no limits, faster answers, and enterprise-grade protection.
