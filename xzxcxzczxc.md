@@ -1,7 +1,14 @@
-Price: At US $20 per month (US $16 if paid yearly), Pro removes every paywall the free tier hits in days; the small fee is offset by even a single hour of saved work.
+Is it necessary to purchase a paid plan?
+Short answer: Yes — to unlock Cursor AI’s full power, you need a paid plan.
 
-Quota: Pro gives unlimited completions plus 500 priority (fast-queue) requests each month—any extra queries still run in the standard queue, so you’re never blocked.
+Plan to start with right away
+Plan	Why it’s the best “starter” choice
+Pro (USD $20 / mo – or $16 / mo billed annually)	• Gives you the full desktop IDE experience, unlimited completions, 500 fast requests, and Max Mode access – everything you’ll evaluate in real work.
+• Month-to-month billing lets you cancel any time if it doesn’t deliver ROI.
 
-Security: Pro (and Business) add Privacy Mode and admin controls that keep your code private, something the free Hobby plan lacks.
+Two strongest reasons to go paid
+No hard limits, no wait time – Unlimited completions plus 500 priority (fast) requests ensure the AI never “locks up” in the middle of your coding session.
 
-Bottom line: If you rely on AI daily, Pro is the smartest spend—no limits, faster answers, and enterprise-grade protection.
+Max Mode for serious projects – Only paid tiers let the AI read hundreds of thousands of tokens at once, essential for refactoring, debugging, or onboarding massive codebases.
+
+Final takeaway: Skip the free tier’s caps; start with Pro so you immediately experience Cursor AI at its full, uninterrupted speed and depth.
