@@ -5,3 +5,12 @@ Instant Smart Suggestions – Real-time, multi-line code completions that cut ke
 Project-Aware Chat Assistant – Ask anything about your codebase and get instant answers, fixes, or explanations.
 
 Plain-English → Code / Command – Describe what you need; AI writes the code or terminal command automatically.
+
+
+Cursor AI is an AI-powered IDE (built on Visual Studio Code) that accelerates every stage of development with smart code completions, project-aware chat assistance, and end-to-end task automation.
+
+
+
+
+
+
